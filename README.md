@@ -1,178 +1,136 @@
 # notion-agent-hive
 
-**Persistent task memory for developers across LLM sessions and CLI tools.**
+**Your AI coding assistant forgets everything between sessions. Notion doesn't.**
 
-A developer workflow that solves the ephemeral context problem: when you return to a project after a break, you shouldn't have to re-explain your intent or re-discover what was in progress. This system uses a Notion kanban board as durable shared memory—surviving across sessions, agents, and CLI tools—so your task context, decisions, and review checkpoints remain available whenever you resume work.
+## Why this exists
 
-## The Problem
+Two things kept annoying me when working with AI coding agents:
 
-As a developer working with AI coding assistants, you've probably experienced this:
+**Sessions die at the worst time.** You're mid-feature on Claude Code, rate limit hits, "come back in three hours." There's no clean way to say "continue this on OpenCode." So you learn to ask it to write the plan down in markdown first, double-check the lists, keep a paper trail. It works, until you forget to ask, and now the context is just gone.
 
-- **Session-local todos disappear** — The todo list you built up in a Claude or OpenCode session is gone when you start fresh
-- **Chat context fades quickly** — "Updated readme" in your chat history doesn't explain *why* you made those changes an hour later
-- **Cross-CLI handoff is painful** — When your Claude session ends, resuming the same feature in OpenCode requires re-pasting prompts and re-discovering state from the repo
-- **Human review lacks durable context** — There's no persistent record of what was planned, what changed, what passed QA, and what still needs a decision
+**You lose track of what actually happened.** You ask the agent to build something. There's back and forth, scope tweaks, small decisions along the way. Eventually it says "done!", gives you a five-item checklist, and behind it sits 200k tokens of internal thinking you're never going to scroll through. You don't quite remember everything that was discussed. You're not sure if something got dropped.
 
-Your task memory shouldn't be trapped inside a single LLM conversation.
+## What this does
 
-## The Solution
+It uses a **Notion kanban board as persistent memory** for the whole workflow. Every feature gets a Notion page with the full plan, all decisions, and the reasoning behind them, plus an inline kanban board where each task is a detailed ticket. The board lives outside any single session, so it's always there when you come back.
 
-This workflow treats a Notion kanban board as **persistent shared memory** for software development tasks:
+Why Notion specifically:
 
-1. **Persistent Task Memory** — Every feature, task, and decision lives in a durable Notion board outside any single LLM session. Start a new chat in any CLI and your task context is immediately available.
+- **Picking up where you left off is trivial.** Any agent, in any session, in any tool, can read the ticket and keep going. The context isn't in chat history, it's in the ticket
+- **You can actually review what happened.** Scroll the feature page to see what was planned, what was decided, and why. No digging through conversation logs
+- **Link to the rest of your stuff.** Tickets can reference your existing Notion docs, specs, design files, whatever. Everything stays connected instead of living in isolated chat threads
 
-2. **Cross-Agent Collaboration** — Three specialized agents (Thinker, Executor, Reviewer) coordinate through the same board. The Thinker plans and orchestrates; the Executor implements; the Reviewer verifies. All state is shared through Notion.
+## How It Works
 
-3. **Cross-Session & Cross-CLI Continuity** — Resume work seamlessly whether you're in Claude Code today, OpenCode tomorrow, or switching between them mid-feature. The board holds the canonical state.
+Three specialized agents coordinate through a shared Notion board:
 
-4. **Human-in-the-Loop Review** — Clear checkpoints with acceptance criteria, QA validation, and explicit human review gates. The board preserves the full context needed for code review: what was planned, what changed, and what passed automated checks.
+| Agent        | Role                                                                                                                                        |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Thinker**  | Plans features, breaks work into tasks, makes product/architecture decisions. Creates the Notion board and populates detailed task tickets. |
+| **Executor** | Implements code based on task specifications. Follows the ticket contract exactly, no guessing, no redesigning.                             |
+| **Reviewer** | Verifies implementations against acceptance criteria. Gates tasks for human review before they can be marked done.                          |
 
-## Agent Overview
+### Ticket Lifecycle
 
-### Thinker
+```mermaid
+flowchart LR
+    Backlog --> ToDo["To Do"]
+    ToDo -->|"Executor picks up"| InProgress["In Progress"]
+    InProgress -->|"Executor reports done"| InTest["In Test"]
+    InTest -->|"Reviewer approves"| HumanReview["Human Review"]
+    InTest -->|"Reviewer rejects"| ToDo
+    HumanReview -->|"Human approves"| Done
+    HumanReview -->|"Human requests changes"| ToDo
 
-Senior product manager agent that plans features using Notion kanban boards as persistent memory. Creates deterministic, implementation-ready task tickets so executors can operate with minimal interpretation. Decomposes work into precise tasks and makes all product and architecture decisions.
+    style Done fill:#2ecc71,color:#fff
+    style HumanReview fill:#9b59b6,color:#fff
+    style InTest fill:#e67e22,color:#fff
+    style InProgress fill:#f1c40f,color:#000
+    style ToDo fill:#3498db,color:#fff
+    style Backlog fill:#95a5a6,color:#fff
+```
 
-### Executor
+**Key rule:** No agent can mark a task as Done. Only you can. The human always has final say.
 
-Implementation-only subagent that modifies code based on task specifications. The sole agent responsible for writing code. Follows the task contract exactly without redesigning intent. Reports structured execution feedback to the Thinker.
+A task can also be moved to **Needs Human Input** at any point when a decision requires your judgment. The agent won't guess.
 
-### Reviewer
+## What a Task Ticket Looks Like
 
-QA subagent that verifies implementations against task specifications, runs tests, and checks acceptance criteria. Strictly read-only with respect to source code. Gates tasks for human review before they can be marked done.
+Each ticket is a self-contained Notion page with:
 
-## Repository Structure
+- **Objective**: what to implement and why
+- **Background & context**: feature overview, architecture decisions, codebase conventions
+- **Affected files & modules**: specific paths and symbols to touch
+- **Technical approach**: numbered implementation plan with concrete references
+- **Acceptance criteria**: binary pass/fail conditions
+- **Validation commands**: exact commands to run and expected outcomes
+
+The ticket is written so that any agent, with zero prior context, can pick it up and execute it. No chat history needed. No re-explaining.
+
+## Getting Started
+
+### Prerequisites
+
+- A Notion workspace with an [integration/API token](https://www.notion.so/my-integrations)
+- The Notion MCP server configured in your CLI tool
+- One of the supported CLI tools (see Installation below)
+
+### Installation
+
+This repo provides agent definitions for multiple CLI tools:
+
+- **Claude Code**: see [`.claude/INSTALL.md`](.claude/INSTALL.md)
+- **OpenCode**: see [`.opencode/INSTALL.md`](.opencode/INSTALL.md)
+
+### Usage
+
+1. Start a conversation with the **Thinker** agent
+2. Describe the feature you want to build
+3. The Thinker will ask clarifying questions, explore your codebase, then create a Notion feature page with a full plan and task board
+4. Say **"execute"** and the Thinker will dispatch tasks to the Executor, run them through the Reviewer, and surface completed work for your review
+5. Review tasks in the **Human Review** column and move them to **Done**, or send them back with comments
+
+You can close your session at any point. When you come back, even in a different tool, just point the Thinker at the same Notion board and pick up where you left off.
+
+---
+
+<details>
+<summary><strong>Technical Details</strong></summary>
+
+### Repository Structure
 
 ```
 notion-agent-hive/
-├── README.md                    # This file
-├── package.json                 # npm scripts and dependencies
-├── tsconfig.json               # TypeScript configuration
-├── vitest.config.ts            # Test runner configuration
-│
-├── agents/                     # Source-of-truth agent templates (shared bodies)
+├── agents/                     # Source-of-truth agent templates
 │   ├── notion-thinker.md
 │   ├── notion-executor.md
 │   └── notion-reviewer.md
-│
-├── scripts/                    # Platform-specific frontmatter generators
+├── scripts/                    # Platform-specific generators
 │   ├── generate-claude-agents.ts
 │   └── generate-opencode-agents.ts
-│
-├── .claude/                    # Generated Claude CLI outputs (committed)
-│   ├── INSTALL.md
-│   └── agents/
-│       ├── notion-thinker.md
-│       ├── notion-executor.md
-│       └── notion-reviewer.md
-│
-└── .opencode/                  # Generated OpenCode CLI outputs (committed)
-    ├── INSTALL.md
-    └── agents/
-        ├── notion-thinker.md
-        ├── notion-executor.md
-        └── notion-reviewer.md
+├── .claude/                    # Generated Claude CLI agents
+└── .opencode/                  # Generated OpenCode agents
 ```
 
-## Source-of-Truth Architecture
+### Source-of-Truth Architecture
 
-This repository uses a **generator-based workflow** to maintain agent definitions for multiple CLI platforms:
+Agent definitions use a generator-based workflow. The markdown body (behavior and instructions) is shared across platforms — only the YAML frontmatter differs per CLI tool.
 
-| Layer | Purpose | Location |
-|-------|---------|----------|
-| **Shared bodies** | Common agent instructions and behavior | `agents/*.md` |
-| **Platform frontmatter** | CLI-specific YAML frontmatter and install logic | `scripts/generate-*.ts` |
-| **Generated outputs** | Committed installable artifacts | `.claude/`, `.opencode/` |
+| Layer                | Purpose                    | Location                 |
+| -------------------- | -------------------------- | ------------------------ |
+| Shared bodies        | Common agent instructions  | `agents/*.md`            |
+| Platform frontmatter | CLI-specific configuration | `scripts/generate-*.ts`  |
+| Generated outputs    | Installable artifacts      | `.claude/`, `.opencode/` |
 
-The markdown body content (below the YAML frontmatter) is identical between the two formats for each agent. Only the frontmatter differs to match each CLI's configuration format.
-
-## Format Differences
-
-| Field | OpenCode | Claude CLI |
-|-------|----------|------------|
-| Agent name | `description` field | `name` field |
-| Tool declaration | Boolean map (`bash: true`) | Comma-separated string (`tools: Bash, Read, Write`) |
-| Tool restrictions | `permission` block with nested allow/deny | `disallowedTools` field |
-| Model specification | Full provider path (e.g., `kimi-for-coding/k2p5`) | Alias (e.g., `opus`, `sonnet`) |
-| MCP servers | Implicit via `notion_*: true` and `mcp_*: true` patterns | Explicit `mcpServers` list |
-| Subagent mode | `mode: subagent`, `hidden: true` | Not specified (inferred from `name` matching `Agent()` reference) |
-| Visual/behavior | `color`, `temperature`, `variant` fields | Not supported |
-
-## Installation
-
-For CLI-specific installation instructions, see the generated INSTALL.md files:
-
-- **Claude CLI**: See `.claude/INSTALL.md`
-- **OpenCode**: See `.opencode/INSTALL.md`
-
-These files contain authoritative, copy-paste-ready instructions for installing the agents into your respective CLI environment.
-
-## Development Commands
-
-### Generating Agent Files
-
-Regenerate all platform-specific outputs from the shared templates:
+### Development
 
 ```bash
-# Generate both Claude and OpenCode outputs
-npm run generate
-
-# Generate only Claude outputs
-npm run generate:claude
-
-# Generate only OpenCode outputs
-npm run generate:opencode
+npm run generate          # Regenerate all platform outputs
+npm test                  # Run tests
 ```
 
-### Testing
+### MCP Requirements
 
-Run the test suite (if tests exist):
+Only the **Notion MCP server** is required. No other MCP servers are mandatory for core functionality.
 
-```bash
-# Run tests once
-npm test
-
-# Run tests in watch mode (useful during development)
-npm run test:watch
-```
-
-## MCP Expectations
-
-These agents are designed around specific MCP (Model Context Protocol) assumptions:
-
-| MCP Server | Status | Notes |
-|------------|--------|-------|
-| **Notion** | Required | All agent workflows depend on Notion for board operations, task management, and persistent memory |
-| **OpenCode-specific MCPs** | Optional | OpenCode agents use `mcp_*: true` pattern, exposing broad MCP access where available in the environment |
-| **Other MCPs (Claude)** | Intentionally excluded | Claude agents list **only** `notion` in `mcpServers` for portability. Additional MCPs can be added locally if needed |
-
-**Important**: Only Notion is required for core functionality. Do not add other MCP servers as mandatory setup requirements.
-
-## Verification for Maintainers
-
-Before committing changes to generators or templates, run these verification steps:
-
-1. **Regenerate outputs** to ensure committed files are up-to-date:
-   ```bash
-   npm run generate
-   ```
-
-2. **Check for placeholder errors** - the generators will exit with error if any `{{PLACEHOLDER}}` remains unresolved in templates
-
-3. **Verify file contents** - confirm `.claude/` and `.opencode/` contain expected agent files with correct frontmatter
-
-4. **Run tests** (if applicable):
-   ```bash
-   npm test
-   ```
-
-5. **Manual sanity check** - ensure generated agent files are valid markdown with proper YAML frontmatter delimiters (`---`)
-
-## Contributing
-
-When modifying agent behavior:
-
-1. Edit the shared templates in `agents/` for body content changes
-2. Edit the generators in `scripts/` for frontmatter or platform-specific changes
-3. Run `npm run generate` to update committed outputs
-4. Commit both template changes and regenerated outputs together
+</details>
