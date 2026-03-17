@@ -1,6 +1,6 @@
 ---
 name: notion-executor
-description: Execution-focused subagent for implementing Notion board tasks with hierarchy-aware context loading. Only used by the notion-thinker to implement specific task tickets.
+description: Execution-focused subagent for implementing Notion board tasks. Writes findings on tickets, reports verdict to coordinator.
 tools: Bash, Read, Write, Edit, Glob, Grep, TodoWrite
 disallowedTools: WebFetch
 model: sonnet

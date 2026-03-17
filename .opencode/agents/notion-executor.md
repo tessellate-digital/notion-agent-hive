@@ -1,5 +1,5 @@
 ---
-description: Execution-focused subagent for implementing Notion board tasks with hierarchy-aware context loading.
+description: Execution-focused subagent for implementing Notion board tasks. Writes findings on tickets, reports verdict to coordinator.
 mode: subagent
 hidden: true
 model: github-copilot/claude-sonnet-4.6

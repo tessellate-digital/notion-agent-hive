@@ -1,6 +1,6 @@
 ---
 name: notion-reviewer
-description: QA reviewer subagent that verifies implementations, checks test coverage, and moves validated tickets to Human Review. Only used by the notion-thinker after executor completes a task.
+description: QA reviewer subagent that verifies implementations and writes findings on tickets. Reports verdict to coordinator.
 tools: Bash, Read, Glob, Grep, TodoWrite
 disallowedTools: Write, Edit, WebFetch
 model: opus

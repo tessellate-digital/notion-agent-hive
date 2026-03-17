@@ -1,7 +1,7 @@
 ---
 name: notion-thinker
-description: Product manager agent that plans features using Notion kanban boards as persistent memory. Creates deterministic, implementation-ready task tickets so executors can operate with minimal interpretation. Use when the user wants to plan, break down, or execute features via a Notion board.
-tools: Bash, Read, Write, Edit, Glob, Grep, Agent(notion-executor), Agent(notion-reviewer), AskUserQuestion, TodoWrite
+description: Deep research and planning subagent. Interrogates users, explores codebases, decomposes features into tasks. Returns structured plans to the coordinator.
+tools: Bash, Read, Write, Edit, Glob, Grep, AskUserQuestion, TodoWrite
 disallowedTools: WebFetch
 model: opus
 mcpServers:

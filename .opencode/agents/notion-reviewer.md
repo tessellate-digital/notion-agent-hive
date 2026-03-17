@@ -1,5 +1,5 @@
 ---
-description: QA reviewer subagent that verifies implementations, checks test coverage, and moves validated tickets to "Human Review" for final human sign-off.
+description: QA reviewer subagent that verifies implementations and writes findings on tickets. Reports verdict to coordinator.
 mode: subagent
 hidden: true
 model: github-copilot/claude-opus-4.6

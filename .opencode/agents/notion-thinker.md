@@ -1,6 +1,8 @@
 ---
-description: Product manager agent that plans features using Notion kanban boards as persistent memory. Creates deterministic, implementation-ready task tickets so executors can operate with minimal interpretation.
-mode: primary
+description: Deep research and planning subagent. Interrogates users, explores codebases, decomposes features into tasks. Returns structured plans to the coordinator.
+mode: subagent
+model: github-copilot/claude-opus-4.6
+hidden: true
 color: "#6C5CE7"
 temperature: 0.2
 tools:
@@ -17,12 +19,10 @@ tools:
   notion_*: true
   mcp_*: true
 permission:
-  webfetch: allow
+  webfetch: deny
   task:
     "*": "deny"
     "explore": "allow"
-    "notion-executor": "allow"
-    "notion-reviewer": "allow"
 ---
 
 # Notion Thinker
