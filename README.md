@@ -22,13 +22,14 @@ Why Notion specifically:
 
 ## How It Works
 
-Three specialized agents coordinate through a shared Notion board:
+A coordinator dispatches three specialized subagents through a shared Notion board:
 
-| Agent        | Role                                                                                                                                        |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Thinker**  | Plans features, breaks work into tasks, makes product/architecture decisions. Creates the Notion board and populates detailed task tickets. |
-| **Executor** | Implements code based on task specifications. Follows the ticket contract exactly, no guessing, no redesigning.                             |
-| **Reviewer** | Verifies implementations against acceptance criteria. Gates tasks for human review before they can be marked done.                          |
+| Agent           | Role                                                                                                                                        |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Coordinator** | Entry point. Owns the Notion board, creates feature pages and task tickets, dispatches subagents, manages all status transitions.            |
+| **Thinker**     | Deep research and investigation. Interrogates users, explores the codebase, decomposes features into tasks. Returns structured reports to the coordinator. Never modifies the board. |
+| **Executor**    | Implements code based on task specifications. Follows the ticket contract exactly, no guessing, no redesigning.                             |
+| **Reviewer**    | Verifies implementations against acceptance criteria. Gates tasks for human review before they can be marked done.                          |
 
 ### Ticket Lifecycle
 
@@ -84,13 +85,13 @@ This repo provides agent definitions for multiple CLI tools:
 
 ### Usage
 
-1. Start a conversation with the **Thinker** agent
+1. Start a conversation with the **Coordinator** agent (notion-agent-hive)
 2. Describe the feature you want to build
-3. The Thinker will ask clarifying questions, explore your codebase, then create a Notion feature page with a full plan and task board
-4. Say **"execute"** and the Thinker will dispatch tasks to the Executor, run them through the Reviewer, and surface completed work for your review
+3. The Coordinator dispatches the Thinker for deep research. The Thinker interrogates you, explores your codebase, and returns a structured plan. The Coordinator then creates the Notion feature page and task board from that plan.
+4. Say **"execute"** and the Coordinator dispatches tasks to the Executor, runs them through the Reviewer, and surfaces completed work for your review
 5. Review tasks in the **Human Review** column and move them to **Done**, or send them back with comments
 
-You can close your session at any point. When you come back, even in a different tool, just point the Thinker at the same Notion board and pick up where you left off.
+You can close your session at any point. When you come back, even in a different tool, just point the Coordinator at the same Notion board and pick up where you left off.
 
 ---
 
@@ -102,6 +103,7 @@ You can close your session at any point. When you come back, even in a different
 ```
 notion-agent-hive/
 ├── agents/                     # Source-of-truth agent templates
+│   ├── notion-agent-hive.md
 │   ├── notion-thinker.md
 │   ├── notion-executor.md
 │   └── notion-reviewer.md

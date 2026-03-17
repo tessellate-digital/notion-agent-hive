@@ -44,7 +44,7 @@ permission:
   {
     name: "notion-thinker",
     frontmatter: `---
-description: Deep research and planning subagent. Interrogates users, explores codebases, decomposes features into tasks. Returns structured plans to the coordinator.
+description: Deep research and investigation subagent. Interrogates users, explores codebases, and returns structured reports (plans, investigations, task refinements) to the coordinator. Read-only board access.
 mode: subagent
 model: github-copilot/claude-opus-4.6
 hidden: true
@@ -207,7 +207,7 @@ Before installing, review the agent definitions. These files include the default
 
 2. Verify the following files are now present in your project's \`.opencode/\` directory:
    - \`notion-agent-hive.md\` - Coordinator agent (entry point) for board management and subagent dispatch
-   - \`notion-thinker.md\` - Subagent for deep research and planning
+   - \`notion-thinker.md\` - Deep research and investigation subagent (returns reports to coordinator)
    - \`notion-executor.md\` - Subagent for implementing specific tasks
    - \`notion-reviewer.md\` - Subagent for QA review
 
@@ -217,8 +217,8 @@ Before installing, review the agent definitions. These files include the default
 
 | File | Purpose |
 |------|---------|
-| \`agents/notion-agent-hive.md\` | Coordinator agent (entry point) that owns the board and dispatches subagents |
-| \`agents/notion-thinker.md\` | Deep research and planning subagent |
+| \`agents/notion-agent-hive.md\` | Coordinator agent (entry point) that owns the board, creates feature pages/tickets, and dispatches subagents |
+| \`agents/notion-thinker.md\` | Deep research and investigation subagent. Returns structured reports to the coordinator. Read-only board access. |
 | \`agents/notion-executor.md\` | Execution-focused subagent for implementing Notion board tasks |
 | \`agents/notion-reviewer.md\` | QA reviewer subagent for verifying implementations |
 
