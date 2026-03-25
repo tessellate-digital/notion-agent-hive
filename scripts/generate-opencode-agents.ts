@@ -76,7 +76,7 @@ permission:
 description: Execution-focused subagent for implementing Notion board tasks. Writes findings on tickets, reports verdict to coordinator.
 mode: subagent
 hidden: true
-model: github-copilot/claude-sonnet-4.6
+model: kimi-for-coding/k2p5
 color: "#0EA5A4"
 temperature: 0.15
 tools:

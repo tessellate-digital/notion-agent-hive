@@ -28,7 +28,7 @@ A coordinator dispatches three specialized subagents through a shared Notion boa
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Coordinator** | Entry point. Owns the Notion board, creates feature pages and task tickets, dispatches subagents, manages all status transitions.            |
 | **Thinker**     | Deep research and investigation. Interrogates users, explores the codebase, decomposes features into tasks. Returns structured reports to the coordinator. Never modifies the board. |
-| **Executor**    | Implements code based on task specifications. Follows the ticket contract exactly, no guessing, no redesigning.                             |
+| **Executor**    | Implements code for the specific ticket assigned by the Coordinator. It may write findings/work summaries on that ticket, then reports back; it does not route itself to other tasks. |
 | **Reviewer**    | Verifies implementations against acceptance criteria. Gates tasks for human review before they can be marked done.                          |
 
 ### Ticket Lifecycle
