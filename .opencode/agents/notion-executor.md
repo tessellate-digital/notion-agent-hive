@@ -18,7 +18,7 @@ tools:
   notion_*: true
   mcp_*: true
 permission:
-  webfetch: deny
+  webfetch: allow
   task:
     "*": "deny"
     "explore": "allow"

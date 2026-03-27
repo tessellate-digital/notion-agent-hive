@@ -46,7 +46,8 @@ permission:
     frontmatter: `---
 description: Deep research and investigation subagent. Interrogates users, explores codebases, and returns structured reports (plans, investigations, task refinements) to the coordinator. Read-only board access.
 mode: subagent
-model: github-copilot/claude-opus-4.6
+model: openai/gpt-5.4
+variant: max
 hidden: true
 color: "#6C5CE7"
 temperature: 0.2
@@ -92,7 +93,7 @@ tools:
   notion_*: true
   mcp_*: true
 permission:
-  webfetch: deny
+  webfetch: allow
   task:
     "*": "deny"
     "explore": "allow"
