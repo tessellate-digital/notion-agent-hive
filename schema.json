@@ -1,0 +1,62 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"title": "notion-agent-hive configuration",
+	"type": "object",
+	"properties": {
+		"$schema": {
+			"type": "string"
+		},
+		"agents": {
+			"type": "object",
+			"properties": {
+				"coordinator": { "$ref": "#/definitions/agentConfig" },
+				"thinker": { "$ref": "#/definitions/agentConfig" },
+				"executor": { "$ref": "#/definitions/agentConfig" },
+				"reviewer": { "$ref": "#/definitions/agentConfig" }
+			},
+			"additionalProperties": false
+		},
+		"fallback": {
+			"type": "object",
+			"properties": {
+				"enabled": { "type": "boolean" },
+				"chains": {
+					"type": "object",
+					"additionalProperties": {
+						"type": "array",
+						"items": { "type": "string" }
+					}
+				}
+			}
+		}
+	},
+	"definitions": {
+		"agentConfig": {
+			"type": "object",
+			"properties": {
+				"model": {
+					"oneOf": [
+						{ "type": "string" },
+						{
+							"type": "array",
+							"items": {
+								"oneOf": [
+									{ "type": "string" },
+									{
+										"type": "object",
+										"properties": {
+											"id": { "type": "string" },
+											"variant": { "type": "string" }
+										},
+										"required": ["id"]
+									}
+								]
+							}
+						}
+					]
+				},
+				"variant": { "type": "string" }
+			}
+		}
+	}
+}
