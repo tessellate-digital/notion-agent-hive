@@ -1,35 +1,41 @@
 # notion-agent-hive
 
-**Your AI coding assistant forgets everything between sessions. Notion doesn't.**
+**Persistent memory for AI coding sessions using Notion.**
 
 ## Why this exists
 
-Two things kept annoying me when working with AI coding agents:
+Two, ahem, persistent problems with AI coding agents:
 
-**Sessions die at the worst time.** You're mid-feature on Claude Code, rate limit hits, "come back in three hours." There's no clean way to say "continue this on OpenCode." So you learn to ask it to write the plan down in markdown first, double-check the lists, keep a paper trail. It works, until you forget to ask, and now the context is just gone.
+**Sessions die at the worst time.** You're mid-feature when rate limits hit or sessions expire. There's no clean way to continue on another platform. You learn to ask agents to write plans in markdown first, but it's easy to forget - and then the context is gone.
 
-**You lose track of what actually happened.** You ask the agent to build something. There's back and forth, scope tweaks, small decisions along the way. Eventually it says "done!", gives you a five-item checklist, and behind it sits 200k tokens of internal thinking you're never going to scroll through. You don't quite remember everything that was discussed. You're not sure if something got dropped.
+**You lose track of what actually happened.** When working on larger features that take time, you often switch between your agent and other tasks. Coming back later, it's hard to trace what happened and what the agent was working on. You get a "done!" checklist but lose the 200k tokens of reasoning behind it, leaving you wondering what was actually discussed and implemented.
+
+**Limited task horizon.** Most AI coding sessions work best for small, contained tasks. When you want to tackle more ambitious, long-running features that span multiple sessions or days, you're left managing context manually - if you can at all.
 
 ## What this does
 
-It uses a **Notion kanban board as persistent memory** for the whole workflow. Every feature gets a Notion page with the full plan, all decisions, and the reasoning behind them, plus an inline kanban board where each task is a detailed ticket. The board lives outside any single session, so it's always there when you come back.
+Uses **Notion kanban boards as persistent memory** for your entire workflow. Every feature gets:
+
+- A dedicated Notion page with the full plan, decisions, and reasoning
+- An inline kanban board with detailed task tickets
+- Context that persists across sessions and tools
 
 Why Notion specifically:
 
-- **Picking up where you left off is trivial.** Any agent, in any session, in any tool, can read the ticket and keep going. The context isn't in chat history, it's in the ticket
-- **You can actually review what happened.** Scroll the feature page to see what was planned, what was decided, and why. No digging through conversation logs
-- **Link to the rest of your stuff.** Tickets can reference your existing Notion docs, specs, design files, whatever. Everything stays connected instead of living in isolated chat threads
+- **You might already be using it at work** - You can easily link the wider context, specs, or designs to the notion agent
+- **Pick up where you left off instantly** - Any agent can read tickets and continue, no chat history needed
+- **Review what actually happened** - See plans, decisions, and reasoning without digging through conversation logs
 
 ## How It Works
 
-A coordinator dispatches three specialized subagents through a shared Notion board:
+A coordinator manages three specialized subagents through a shared Notion board:
 
-| Agent           | Role                                                                                                                                                                                  |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Coordinator** | Entry point. Owns the Notion board, creates feature pages and task tickets, dispatches subagents, manages all status transitions.                                                     |
-| **Thinker**     | Deep research and investigation. Interrogates users, explores the codebase, decomposes features into tasks. Returns structured reports to the coordinator. Never modifies the board.  |
-| **Executor**    | Implements code for the specific ticket assigned by the Coordinator. It may write findings/work summaries on that ticket, then reports back; it does not route itself to other tasks. |
-| **Reviewer**    | Verifies implementations against acceptance criteria. Gates tasks for human review before they can be marked done.                                                                    |
+| Agent           | Role                                                                                                                                                                                 |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Coordinator** | Entry point. Manages the Notion board, creates feature pages and task tickets, dispatches subagents, and handles status transitions.                                                 |
+| **Thinker**     | Deep research and investigation. Interrogates users, explores the codebase, decomposes features into tasks. Returns structured reports to the coordinator. Never modifies the board. |
+| **Executor**    | Implements code for the specific ticket assigned by the Coordinator. Writes findings/work summaries on that ticket, then reports back; does not route itself to other tasks.         |
+| **Reviewer**    | Verifies implementations against acceptance criteria. Gates tasks for human review before they can be marked done.                                                                   |
 
 ### Ticket Lifecycle
 
@@ -55,20 +61,18 @@ flowchart LR
 
 A task can also be moved to **Needs Human Input** at any point when a decision requires your judgment. The agent won't guess.
 
-## What a Task Ticket Looks Like
+## Installation
 
-Each ticket is a self-contained Notion page with:
+### Quick Start
 
-- **Objective**: what to implement and why
-- **Background & context**: feature overview, architecture decisions, codebase conventions
-- **Affected files & modules**: specific paths and symbols to touch
-- **Technical approach**: numbered implementation plan with concrete references
-- **Acceptance criteria**: binary pass/fail conditions
-- **Validation commands**: exact commands to run and expected outcomes
+```bash
+bunx @its-me-loic/notion-agent-hive@latest install
+```
 
-The ticket is written so that any agent, with zero prior context, can pick it up and execute it. No chat history needed. No re-explaining.
+This command:
 
-## Getting Started
+1. Adds `@its-me-loic/notion-agent-hive` to the `plugin` array in `~/.config/opencode/opencode.json`
+2. Creates a `~/.config/opencode/notion-agent-hive.json` starter config
 
 ### Prerequisites
 
@@ -76,9 +80,7 @@ The ticket is written so that any agent, with zero prior context, can pick it up
 - A Notion workspace with an [integration/API token](https://www.notion.so/my-integrations)
 - The [Notion MCP server](https://github.com/makenotion/notion-mcp-server) configured in OpenCode
 
-### Installation
-
-#### Local Development
+### Local Development
 
 If you're developing from this repo instead of installing a published npm package, use a local plugin file.
 
@@ -134,7 +136,7 @@ export { NotionAgentHivePlugin };
 
 When you change plugin source, rebuild `dist/index.js` so OpenCode picks up the new code.
 
-#### Published Package
+### Published Package
 
 Once the package is published, the intended install command is:
 
