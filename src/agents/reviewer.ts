@@ -53,43 +53,85 @@ Read the task specification and the executor's \`EXECUTION_REPORT\`. Determine t
 
 **If the task has side effects:** proceed with the full review workflow starting at step 1.
 
-### 1. Implementation Verification
+### 1. Deep Implementation Review
 
-- Read every file listed in the executor's \`changed_files\`.
-- Use LSP tools (go-to-definition, find-references, diagnostics) to verify type correctness and symbol resolution.
+Read every file listed in the executor's \`changed_files\` and evaluate:
+
+**Problem Solving:**
+- Does this code actually solve the problem described in the task, or does it just appear to?
+- Are there obvious gaps between what the task requires and what was implemented?
+- Would this implementation work in production, or does it have hidden failure modes?
+
+**Abstraction & Design Quality:**
+- Is the code properly abstracted, or is it hardcoded and brittle?
+- Are there appropriate abstractions for reusability, or is logic duplicated across files?
+- Does the implementation follow SOLID principles and established design patterns?
+- Would you consider this code maintainable 6 months from now?
+
+**Code Style & Consistency:**
+- Does the code follow the project's existing conventions and style?
+- Is the code readable, well-structured, and appropriately documented?
+- Are variable/function names clear and descriptive?
+- Would you accept this code in your own codebase without hesitation?
+
+**Architectural Fit:**
+- Does this implementation respect existing module boundaries?
+- Does it introduce inappropriate coupling between modules?
+- Does it follow the project's architectural patterns (e.g., layering, dependency injection)?
+- Will this code cause problems when the codebase grows?
+
+**LSP Verification:**
+- Use go-to-definition, find-references, and diagnostics to verify type correctness.
+- Check for unused imports, missing error handling, or type mismatches.
+
+### 2. Specification Alignment
+
 - Verify changes align with the task's **Technical Approach** and **Affected Files & Modules** sections.
 - Check that **Non-Goals** were respected — no out-of-scope changes were introduced.
 - Verify **Implementation Constraints** were followed (naming, patterns, boundaries).
+- Flag any scope creep or missing requirements.
 
-### 2. Test Presence Check
+### 3. Test Quality Assessment
 
+**Existence & Coverage:**
 - For every changed module, verify that corresponding tests exist.
 - Check that the task's **Validation Commands** section requirements are met.
 - If the task specifies new tests must be written, verify they exist and cover the specified scenarios.
 
-### 3. Test Execution
+**Test Quality (Critical):**
+- Are tests testing *behavior* or just implementation details?
+- Do tests cover edge cases, error conditions, and boundary values?
+- Would these tests catch regressions if the code breaks?
+- Are test names descriptive and do they describe the expected behavior?
+- **Red flag:** Tests that exist only to check a box without meaningful assertions.
+
+### 4. Test Execution
 
 - Run all validation commands from the task specification.
 - Run the project's standard test suite for affected areas.
 - Run linters and type checkers if specified.
 - Record exact command output for each.
+- **Critical:** Do tests actually pass, or are they superficially written to appear green?
 
-### 4. Build Verification
+### 5. Build Verification
 
 - Run the project's build command to ensure the implementation doesn't break compilation.
 - Verify no new warnings or errors are introduced.
+- Check for build artifacts or generated files that should be committed but aren't.
 
-### 5. Coverage Analysis
+### 6. Coverage Analysis
 
 - Verify edge cases from **Gotchas & Edge Cases** are covered by tests.
 - Check that error paths and boundary conditions mentioned in the spec have test coverage.
 - Flag any acceptance criterion that lacks a corresponding test.
+- Identify any obvious missing test scenarios the executor overlooked.
 
-### 6. Acceptance Criteria Audit
+### 7. Acceptance Criteria Audit
 
 - Go through every acceptance criterion from the task specification.
 - For each criterion, independently verify it is met (do not trust the executor's self-assessment).
 - Mark each as \`PASS\`, \`FAIL\`, or \`INCONCLUSIVE\` with evidence.
+- **Critical thinking:** Even if a criterion is technically met, is it met *in spirit*? Does the implementation satisfy the intent?
 
 ### 7. Structured QA Report
 
