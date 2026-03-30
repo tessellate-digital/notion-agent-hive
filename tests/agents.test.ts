@@ -10,9 +10,9 @@ describe("AgentDefinition", () => {
 	it("should accept a valid agent definition", () => {
 		const def: AgentDefinition = {
 			name: "test-agent",
-			description: "A test agent",
 			config: {
-				system: "You are a test agent.",
+				description: "A test agent",
+				prompt: "You are a test agent.",
 			},
 		};
 		expect(def.name).toBe("test-agent");
@@ -64,8 +64,8 @@ describe("createThinkerAgent", () => {
 
 	it("denies code modification tools", () => {
 		const agent = createThinkerAgent();
-		expect(agent.config.tools?.Edit).toBe("deny");
-		expect(agent.config.tools?.Write).toBe("deny");
+		expect(agent.config.tools?.Edit).toBe(false);
+		expect(agent.config.tools?.Write).toBe(false);
 	});
 
 	it("applies model array correctly", () => {
@@ -106,8 +106,8 @@ describe("createReviewerAgent", () => {
 
 	it("denies code modification tools", () => {
 		const agent = createReviewerAgent();
-		expect(agent.config.tools?.Edit).toBe("deny");
-		expect(agent.config.tools?.Write).toBe("deny");
+		expect(agent.config.tools?.Edit).toBe(false);
+		expect(agent.config.tools?.Write).toBe(false);
 	});
 
 	it("applies model array correctly", () => {

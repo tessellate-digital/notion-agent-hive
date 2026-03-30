@@ -388,8 +388,8 @@ export function createThinkerAgent(
 				bash: "deny",
 			},
 			tools: {
-				Edit: "deny",
-				Write: "deny",
+				Edit: false,
+				Write: false,
 			},
 		},
 	};
