@@ -38,7 +38,7 @@ describe("install", () => {
 		expect(existsSync(join(PROJECT_DIR, "opencode.json"))).toBe(false);
 
 		const config = readJson(join(CONFIG_DIR, "opencode.json"));
-		expect(config.plugin).toContain("@its-me-loic/notion-agent-hive");
+		expect(config.plugin).toContain("@tesselate-digital/notion-agent-hive");
 	});
 
 	it("adds plugin to existing opencode.json", async () => {
@@ -47,7 +47,7 @@ describe("install", () => {
 		await install();
 
 		const config = readJson(join(CONFIG_DIR, "opencode.json"));
-		expect(config.plugin).toContain("@its-me-loic/notion-agent-hive");
+		expect(config.plugin).toContain("@tesselate-digital/notion-agent-hive");
 		expect(config.plugin).toContain("other-plugin");
 	});
 
@@ -60,21 +60,21 @@ describe("install", () => {
 		await install();
 
 		const config = readJson(join(CONFIG_DIR, "opencode.json"));
-		expect(config.plugin).toEqual(["other-plugin", "@its-me-loic/notion-agent-hive"]);
+		expect(config.plugin).toEqual(["other-plugin", "@tesselate-digital/notion-agent-hive"]);
 		expect(config.plugins).toBeUndefined();
 	});
 
 	it("does not duplicate plugin entry", async () => {
 		writeFileSync(
 			join(CONFIG_DIR, "opencode.json"),
-			JSON.stringify({ plugin: ["@its-me-loic/notion-agent-hive"] }),
+			JSON.stringify({ plugin: ["@tesselate-digital/notion-agent-hive"] }),
 		);
 
 		await install();
 
 		const config = readJson(join(CONFIG_DIR, "opencode.json"));
 		expect(
-			config.plugin.filter((p: string) => p === "@its-me-loic/notion-agent-hive"),
+			config.plugin.filter((p: string) => p === "@tesselate-digital/notion-agent-hive"),
 		).toHaveLength(1);
 	});
 
@@ -87,7 +87,7 @@ describe("install", () => {
 		await install();
 
 		const config = readJson(join(CONFIG_DIR, "opencode.json"));
-		expect(config.plugin).toEqual(["@its-me-loic/notion-agent-hive"]);
+		expect(config.plugin).toEqual(["@tesselate-digital/notion-agent-hive"]);
 	});
 
 	it("creates starter notion-agent-hive.json in the global config dir", async () => {
@@ -98,7 +98,7 @@ describe("install", () => {
 
 		const config = readJson(join(CONFIG_DIR, "notion-agent-hive.json"));
 		expect(config.$schema).toBe(
-			"https://unpkg.com/@its-me-loic/notion-agent-hive@latest/schema.json",
+			"https://unpkg.com/@tesselate-digital/notion-agent-hive@latest/schema.json",
 		);
 		expect(config.agents).toEqual({
 			coordinator: { model: "openai/gpt-5.2" },
