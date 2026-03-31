@@ -1,7 +1,11 @@
 {
   "name": "@tesselate-digital/notion-agent-hive",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "provenance": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tessellate-digital/notion-agent-hive"
+  },
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
