@@ -1,10 +1,14 @@
 // src/cli/install.ts
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { DEFAULT_MODELS, DEFAULT_VARIANTS, getGlobalConfigDir } from "../config";
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const pkg = JSON.parse(readFileSync(join(__dirname, "../../package.json"), "utf-8"));
+
 const PLUGIN_ID = "notion-agent-hive";
-const PACKAGE_NAME = "@its-me-loic/notion-agent-hive";
+const PACKAGE_NAME = pkg.name as string;
 
 interface OpencodeConfig {
 	plugin?: string[];

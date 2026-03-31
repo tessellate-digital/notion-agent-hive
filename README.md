@@ -66,12 +66,12 @@ A task can also be moved to **Needs Human Input** at any point when a decision r
 ### Quick Start
 
 ```bash
-bunx @its-me-loic/notion-agent-hive@latest install
+bunx @tesselate-digital/notion-agent-hive install
 ```
 
 This command:
 
-1. Adds `@its-me-loic/notion-agent-hive` to the `plugin` array in `~/.config/opencode/opencode.json`
+1. Adds `@tesselate-digital/notion-agent-hive` to the `plugin` array in `~/.config/opencode/opencode.json`
 2. Creates a `~/.config/opencode/notion-agent-hive.json` starter config
 
 ### Prerequisites
@@ -138,16 +138,14 @@ When you change plugin source, rebuild `dist/index.js` so OpenCode picks up the 
 
 ### Published Package
 
-Once the package is published, the intended install command is:
-
 ```bash
-bunx @its-me-loic/notion-agent-hive@latest install
+bunx @tesselate-digital/notion-agent-hive install
 ```
 
 This command:
 
-1. Adds `@its-me-loic/notion-agent-hive` to the `plugin` array in `~/.config/opencode/opencode.json` (or `$OPENCODE_CONFIG_DIR/opencode.json` / `$XDG_CONFIG_HOME/opencode/opencode.json`)
-2. Creates a `~/.config/opencode/notion-agent-hive.json` starter config (or the matching `$OPENCODE_CONFIG_DIR` / `$XDG_CONFIG_HOME` location)
+1. Adds `@tesselate-digital/notion-agent-hive` to the `plugin` array in `~/.config/opencode/opencode.json` (or `$OPENCODE_CONFIG_DIR/opencode.json` / `$XDG_CONFIG_HOME/opencode/opencode.json`)
+2. Creates a `~/.config/opencode/notion-agent-hive.json` starter config (or the matching `$OPENCODE_CONFIG_DIR` / `$XGD_CONFIG_HOME` location)
 
 If you want per-project overrides, create `notion-agent-hive.json` in the project root manually.
 
