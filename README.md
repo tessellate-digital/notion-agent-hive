@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logo.png" alt="Notion Agent Hive" width="400">
+</p>
+
 # notion-agent-hive
 
 **Persistent memory for AI coding sessions using Notion.**
