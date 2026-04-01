@@ -8,31 +8,27 @@
 
 ## Why this exists
 
-Two, ahem, persistent problems with AI coding agents:
+Like many, I've been using LLMs extensively, in every flavour, and with all sorts of harnesses (Claude code, Codex, Copilot, etc.)
 
-**Sessions die at the worst time.** You're mid-feature when rate limits hit or sessions expire. There's no clean way to continue on another platform. You learn to ask agents to write plans in markdown first, but it's easy to forget - and then the context is gone.
+While they can be wildly effective, I found some limitations in my workflow:
+
+**Form factor** CLIs can be a bit clunky to collect one's thoughts. I love to write, edit, revisit, add structure through headers and richer markup ... Command line doesn't feel like the best place for that.
 
 **You lose track of what actually happened.** When working on larger features that take time, you often switch between your agent and other tasks. Coming back later, it's hard to trace what happened and what the agent was working on. You get a "done!" checklist but lose the 200k tokens of reasoning behind it, leaving you wondering what was actually discussed and implemented.
 
-**Limited task horizon.** Most AI coding sessions work best for small, contained tasks. When you want to tackle more ambitious, long-running features that span multiple sessions or days, you're left managing context manually - if you can at all.
+**Sessions die at the worst time.** Especially when Anthropic cuts your plan allowance. The plan and logs live somewhere in some temp folder, you could do some digging, fire opencode, and let it handle the context all over again, but this is a bit awkward and wasteful.
+
+**Limited task horizon.** Models' performance tend to degrade far below their max context size. I found it hard to reliably tackle more ambitious features because of it. Harnesses _may_ compact, or _may_ use subagents, which can help, but feels like a roll of dice. Being diligent, going through plan -> execute loops helps too, but then you're still facing issues 1-3 in this list.
 
 ## What this does
 
-Uses **Notion kanban boards as persistent memory** for your entire workflow. Every feature gets:
+This uses Notion as a persistent memory layer and source of truth. Every feature gets:
 
 - A dedicated Notion page with the full plan, decisions, and reasoning
 - An inline kanban board with detailed task tickets
 - Context that persists across sessions and tools
 
-Why Notion specifically:
-
-- **You might already be using it at work** - You can easily link the wider context, specs, or designs to the notion agent
-- **Pick up where you left off instantly** - Any agent can read tickets and continue, no chat history needed
-- **Review what actually happened** - See plans, decisions, and reasoning without digging through conversation logs
-
-## How It Works
-
-A coordinator manages three specialized subagents through a shared Notion board:
+Under the hood, the tool will synchronise a few specialised subagents:
 
 | Agent           | Role                                                                                                                                                                                 |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -41,29 +37,17 @@ A coordinator manages three specialized subagents through a shared Notion board:
 | **Executor**    | Implements code for the specific ticket assigned by the Coordinator. Writes findings/work summaries on that ticket, then reports back; does not route itself to other tasks.         |
 | **Reviewer**    | Verifies implementations against acceptance criteria. Gates tasks for human review before they can be marked done.                                                                   |
 
-### Ticket Lifecycle
+It's quite flexible. Fire it with a rough idea, either inline or in a Notion page, and it will interactively create a plan. Give it an existing plan in Notion, and it will resume the work. Just like that, you get:
 
-```mermaid
-flowchart LR
-    Backlog --> ToDo["To Do"]
-    ToDo -->|"Executor picks up"| InProgress["In Progress"]
-    InProgress -->|"Executor reports done"| InTest["In Test"]
-    InTest -->|"Reviewer approves"| HumanReview["Human Review"]
-    InTest -->|"Reviewer rejects"| ToDo
-    HumanReview -->|"Human approves"| Done
-    HumanReview -->|"Human requests changes"| ToDo
+- **A proper space to think.** Notion pages with headers, tables, and structure. Each step becomes a ticket on a board with rich context, not a checklist item in a terminal.
+- **A proper space to review.** Leave comments on specific parts of the plan. Add notes. Give feedback where it matters, not in a chat thread that scrolls away.
+- **A proper space to supervise.** The board shows you exactly where everything stands at a glance.
 
-    style Done fill:#2ecc71,color:#fff
-    style HumanReview fill:#9b59b6,color:#fff
-    style InTest fill:#e67e22,color:#fff
-    style InProgress fill:#f1c40f,color:#000
-    style ToDo fill:#3498db,color:#fff
-    style Backlog fill:#95a5a6,color:#fff
-```
+Each task runs with a fresh context, so you stay in the sweet spot where models perform best. When you want to review what an agent did, just look at the ticket: the work summary and QA report are right there.
 
-**Key rule:** No agent can mark a task as Done. Only you can. The human always has final say.
+It also saves money. You can assign a strong model for planning, a fast one for coordination, and a cheaper one for execution, since the thinking has already been done.
 
-A task can also be moved to **Needs Human Input** at any point when a decision requires your judgment. The agent won't guess.
+I'm still toying with different configurations, but had some good results using chatGPT 5.4 mini as the fast coordinator, chatGPT 5.4 (With high effort) or opus 4.6 as the thinker/reviewer, and at this point anything "Not considered SOTA but still good" like KIMI K2.5, GLM-5, or Devstral as the executor, where most of the tokens are spent.
 
 ## Installation
 
@@ -84,92 +68,6 @@ This command:
 - A Notion workspace with an [integration/API token](https://www.notion.so/my-integrations)
 - The [Notion MCP server](https://github.com/makenotion/notion-mcp-server) configured in OpenCode
 
-### Local Development
-
-If you're developing from this repo instead of installing a published npm package, use a local plugin file.
-
-OpenCode auto-loads `.ts` plugin files from `~/.config/opencode/plugins/` (or `$OPENCODE_CONFIG_DIR/plugins` / `$XDG_CONFIG_HOME/opencode/plugins` if you use those).
-
-1. Build the plugin bundle:
-
-```bash
-bun install
-bun build src/index.ts --outdir dist --target bun --format esm
-```
-
-2. Create `~/.config/opencode/plugins/notion-agent-hive.ts`:
-
-```ts
-import { NotionAgentHivePlugin } from "/absolute/path/to/notion-agent-hive/dist/index.js";
-
-export { NotionAgentHivePlugin };
-```
-
-3. Create `~/.config/opencode/notion-agent-hive.json` to choose models for each internal agent:
-
-```json
-{
-  "agents": {
-    "coordinator": { "model": "openai/gpt-5.2" },
-    "thinker": { "model": "openai/gpt-5.4", "variant": "xhigh" },
-    "executor": { "model": "kimi-for-coding/k2p5" },
-    "reviewer": { "model": "openai/gpt-5.4", "variant": "xhigh" }
-  },
-  "fallback": {
-    "enabled": true,
-    "chains": {}
-  }
-}
-```
-
-4. Configure your Notion MCP server in `~/.config/opencode/opencode.json` if you haven't already:
-
-```json
-{
-  "mcp": {
-    "notion": {
-      "type": "remote",
-      "url": "https://mcp.notion.com/mcp"
-    }
-  }
-}
-```
-
-5. Restart OpenCode.
-6. Start a session with the `notion agent hive` agent.
-
-When you change plugin source, rebuild `dist/index.js` so OpenCode picks up the new code.
-
-### Published Package
-
-```bash
-bunx @tesselate-digital/notion-agent-hive install
-```
-
-This command:
-
-1. Adds `@tesselate-digital/notion-agent-hive` to the `plugin` array in `~/.config/opencode/opencode.json` (or `$OPENCODE_CONFIG_DIR/opencode.json` / `$XDG_CONFIG_HOME/opencode/opencode.json`)
-2. Creates a `~/.config/opencode/notion-agent-hive.json` starter config (or the matching `$OPENCODE_CONFIG_DIR` / `$XGD_CONFIG_HOME` location)
-
-If you want per-project overrides, create `notion-agent-hive.json` in the project root manually.
-
-Then configure your Notion MCP server in `~/.config/opencode/opencode.json` if you haven't already:
-
-```json
-{
-  "mcp": {
-    "notion": {
-      "type": "npx",
-      "command": "npx",
-      "args": ["-y", "@notionhq/notion-mcp-server"],
-      "env": {
-        "OPENAPI_MCP_HEADERS": "{\"Authorization\": \"Bearer YOUR_NOTION_TOKEN\"}"
-      }
-    }
-  }
-}
-```
-
 ### Configuring Models
 
 There are two places to configure models, merged at startup:
@@ -181,15 +79,7 @@ There are two places to configure models, merged at startup:
 
 Project config takes precedence. Agent keys are merged individually — setting `thinker` in the project config does not wipe out `executor` from your global config.
 
-Restart OpenCode for changes to take effect.
-
----
-
-Model IDs use the `provider/model-name` format that OpenCode uses — any provider configured in your OpenCode setup works here.
-
-The public agent name is `notion agent hive`, but the model config key is still `coordinator`.
-
-The `$schema` path depends on how you installed the plugin. For local development or global config, it's simplest to omit `$schema`.
+Example config:
 
 ```json
 {
@@ -202,27 +92,7 @@ The `$schema` path depends on how you installed the plugin. For local developmen
 }
 ```
 
-Each agent has a distinct role, so you can tune them independently:
-
-| Agent           | Role                                 | Suggested model profile                                     |
-| --------------- | ------------------------------------ | ----------------------------------------------------------- |
-| **coordinator** | Dispatches agents, moves tickets     | Fast and cheap — it mostly routes, not thinks               |
-| **thinker**     | Deep research, feature decomposition | Most capable model you have — this is where quality matters |
-| **executor**    | Code implementation                  | Balanced — good at coding tasks                             |
-| **reviewer**    | QA verification, criteria checking   | Same tier as executor                                       |
-
-#### Variants
-
-Some providers support model-specific variants such as `"xhigh"` or `"max"`:
-
-```json
-{
-  "agents": {
-    "thinker": { "model": "openai/gpt-5.4", "variant": "xhigh" },
-    "reviewer": { "model": "anthropic/claude-opus-4", "variant": "max" }
-  }
-}
-```
+Restart OpenCode for changes to take effect.
 
 #### Fallback chains
 
@@ -257,47 +127,3 @@ You can also pass the full chain directly as the `model` value — the first ent
   }
 }
 ```
-
-### Usage
-
-1. Open OpenCode and start a session with the **notion agent hive** agent
-2. Describe the feature you want to build
-3. The Coordinator dispatches the Thinker, who interrogates you, explores your codebase, and creates the Notion feature page + task board
-4. Say **"execute"** and the Coordinator dispatches tasks to the Executor, runs them through the Reviewer, and surfaces completed work for your review
-5. Review tasks in the **Human Review** column and move them to **Done**, or send them back with comments
-
-You can close your session at any point. When you come back, point the Coordinator at the same Notion board and pick up where you left off.
-
----
-
-<details>
-<summary><strong>Technical Details</strong></summary>
-
-### Repository Structure
-
-```
-notion-agent-hive/
-├── src/
-│   ├── agents/
-│   │   ├── types.ts          # AgentDefinition + AgentConfig interfaces
-│   │   ├── coordinator.ts    # notion agent hive agent factory
-│   │   ├── thinker.ts        # notion-thinker agent factory
-│   │   ├── executor.ts       # notion-executor agent factory
-│   │   └── reviewer.ts       # notion-reviewer agent factory
-│   ├── cli/
-│   │   ├── index.ts          # CLI entry point
-│   │   └── install.ts        # install command
-│   ├── config.ts             # Config loading + Zod validation
-│   ├── fallback.ts           # Runtime model fallback manager
-│   └── index.ts              # Plugin entry point + public API
-├── schema.json               # JSON Schema for notion-agent-hive.json
-├── biome.json
-├── tsconfig.json
-└── package.json
-```
-
-### MCP Requirements
-
-Only the **Notion MCP server** is required. No other MCP servers are mandatory for core functionality.
-
-</details>

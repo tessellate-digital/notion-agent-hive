@@ -96,12 +96,30 @@ Before producing any task breakdown, explore the codebase to gather concrete con
 
 Break the feature into tasks following these principles:
 
-1. **Independence first**: Each task should be implementable without waiting for other tasks wherever possible. When dependencies exist, make them explicit.
+1. **Independence first**: Design tasks that can run in parallel by default.
+   - Slice by module/file rather than by workflow step (e.g., "implement auth service" not "implement login, then implement logout")
+   - Prefer "implement X in isolation" over "implement X, then wire it up"
+   - Extract shared concerns (types, schemas, configs) into dedicated foundation tasks that others depend on
+   - If two tasks would touch the same file, question whether they are truly independent or should be merged/resequenced
 2. **One concern per task**: A task should do one thing well. Do not bundle unrelated changes.
 3. **Testable**: Each task should have verifiable acceptance criteria.
 4. **Ordered by dependency**: Tasks that others depend on should be higher priority.
-5. **Right-sized**: A task should be completable in a single agent session. If it feels too large, split it.
+5. **Small by default**: Prefer many small tasks over few large ones.
+   - If a task has more than 5 subtasks, it is too big — decompose further
+   - "Large" complexity is a smell: always ask "can this be two tasks instead?"
+   - When in doubt, split. Merging tasks later is easier than debugging a monolithic one.
 6. **Contract-first handoff**: Every task must be closed at the contract level (what/where/constraints/acceptance), while allowing normal implementation-level leeway.
+
+#### Dependency Minimization Checklist
+
+Before finalizing tasks, verify:
+
+- [ ] Each dependency is truly necessary — would the dependent task fail without it, or is it just convenient ordering?
+- [ ] No chain dependencies that could be broken (A→B→C→D often hides parallelizable work)
+- [ ] Shared concerns (types, schemas, configs) are extracted to foundation tasks rather than duplicated or assumed
+- [ ] No two tasks modify the same file unless absolutely necessary
+
+If the checklist fails, refactor the task breakdown before proceeding.
 
 #### Ticket Strictness Rules (Non-Negotiable)
 
@@ -377,34 +395,36 @@ open_questions:
 `;
 
 export function createThinkerAgent(
-	model?: string | Array<string | { id: string; variant?: string }>,
-	variant?: string,
+  model?: string | Array<string | { id: string; variant?: string }>,
+  variant?: string,
 ): AgentDefinition {
-	const definition: AgentDefinition = {
-		name: "notion-thinker",
-		config: {
-			description: "Deep research and planning agent for feature decomposition",
-			mode: "subagent",
-			prompt: THINKER_PROMPT,
-			temperature: 0.3,
-			permission: {
-				question: "allow",
-				edit: "deny",
-				bash: "deny",
-			},
-			tools: {
-				Edit: false,
-				Write: false,
-			},
-		},
-	};
+  const definition: AgentDefinition = {
+    name: "notion-thinker",
+    config: {
+      description: "Deep research and planning agent for feature decomposition",
+      mode: "subagent",
+      prompt: THINKER_PROMPT,
+      temperature: 0.3,
+      permission: {
+        question: "allow",
+        edit: "deny",
+        bash: "deny",
+      },
+      tools: {
+        Edit: false,
+        Write: false,
+      },
+    },
+  };
 
-	if (Array.isArray(model)) {
-		definition._modelArray = model.map((m) => (typeof m === "string" ? { id: m } : m));
-	} else if (typeof model === "string" && model) {
-		definition.config.model = model;
-		if (variant) definition.config.variant = variant;
-	}
+  if (Array.isArray(model)) {
+    definition._modelArray = model.map((m) =>
+      typeof m === "string" ? { id: m } : m,
+    );
+  } else if (typeof model === "string" && model) {
+    definition.config.model = model;
+    if (variant) definition.config.variant = variant;
+  }
 
-	return definition;
+  return definition;
 }
