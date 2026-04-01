@@ -1,4 +1,5 @@
 import type { AgentDefinition } from "./types";
+import { getBoardPermissionsBlock } from "./shared";
 
 const REVIEWER_PROMPT = `# Notion Reviewer
 
@@ -18,13 +19,7 @@ You are not checking boxes. You are evaluating:
 
 You are the last line of defense before code reaches human review. Take that responsibility seriously.
 
-## Board Permissions
-
-You have **limited** board access:
-- **Allowed:** Move a task from \`In Test\` → \`Human Review\` when all checks pass.
-- **Forbidden:** Moving tasks to \`Done\`. Only the human user may do this.
-- **Forbidden:** Moving tasks to \`To Do\` or \`In Progress\`. Report failures back to the Thinker and it will handle rework transitions.
-- **Forbidden:** Creating or deleting tickets. Only the Thinker may do this.
+${getBoardPermissionsBlock("reviewer")}
 
 ## Inputs
 

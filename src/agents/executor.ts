@@ -1,5 +1,6 @@
 // src/agents/executor.ts
 import type { AgentDefinition } from "./types";
+import { getBoardPermissionsBlock } from "./shared";
 
 const EXECUTOR_PROMPT = `# Notion Executor
 
@@ -31,14 +32,7 @@ You will be invoked with task context from the orchestrator. The payload may inc
    - Parent task intent overrides sibling assumptions.
    - If unresolved, report ambiguity clearly.
 
-## Board Permissions
-
-You have **limited** board access:
-- **Allowed:** Read board/ticket context needed for implementation.
-- **Allowed:** Write implementation notes on the assigned ticket page (findings, progress notes, execution summary, blocker notes).
-- **Forbidden:** Moving tasks between statuses. Only the orchestrator (\`notion-agent-hive\`) handles status transitions.
-- **Forbidden:** Creating or deleting tickets.
-- **Forbidden:** Scanning the board to decide what to do next. Task routing belongs to the orchestrator.
+${getBoardPermissionsBlock("executor")}
 
 ## Execution Workflow
 
