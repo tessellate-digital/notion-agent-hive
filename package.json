@@ -1,10 +1,10 @@
 {
   "name": "@tesselate-digital/notion-agent-hive",
-  "version": "0.0.10-alpha",
+  "version": "0.0.10",
   "provenance": true,
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tessellate-digital/notion-agent-hive.git"
+    "url": "https://github.com/tessellate-digital/notion-agent-hive"
   },
   "type": "module",
   "main": "dist/index.js",
@@ -19,6 +19,10 @@
     "README.md",
     "LICENSE"
   ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "build:prompts": "bun scripts/build-prompts.ts",
     "build": "bun run build:prompts && bun build src/index.ts --outdir dist --target bun --format esm && bun build src/cli/index.ts --outdir dist/cli --target bun --format esm && tsc --emitDeclarationOnly",
