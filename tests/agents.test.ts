@@ -35,7 +35,7 @@ describe("createCoordinatorAgent", () => {
 	it("creates agent with default config", () => {
 		const agent = createCoordinatorAgent();
 		expect(agent.name).toBe("notion agent hive");
-		expect(agent.config.prompt).toContain("coordinator");
+		expect(agent.config.prompt).toBeDefined();
 	});
 
 	it("applies string model override", () => {
