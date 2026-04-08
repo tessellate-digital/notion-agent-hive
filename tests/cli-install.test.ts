@@ -105,15 +105,59 @@ describe("install", () => {
 			thinker: { model: "openai/gpt-5.4", variant: "xhigh" },
 			executor: { model: "kimi-for-coding/k2p5" },
 			reviewer: { model: "openai/gpt-5.4", variant: "xhigh" },
+			finalReviewer: { model: "openai/gpt-5.4", variant: "xhigh" },
+			gitCommitArchitect: { model: "openai/gpt-5.4", variant: "xhigh" },
 		});
 	});
 
-	it("does not overwrite existing notion-agent-hive.json", async () => {
+	it("patches existing notion-agent-hive.json to add missing new agents", async () => {
+		writeFileSync(
+			join(CONFIG_DIR, "notion-agent-hive.json"),
+			JSON.stringify({
+				agents: {
+					coordinator: { model: "openai/gpt-5.2" },
+					thinker: { model: "openai/gpt-5.4", variant: "xhigh" },
+					executor: { model: "kimi-for-coding/k2p5" },
+					reviewer: { model: "openai/gpt-5.4", variant: "xhigh" },
+				},
+			}),
+		);
+
+		await install();
+
+		const config = readJson(join(CONFIG_DIR, "notion-agent-hive.json"));
+		expect(config.agents.finalReviewer).toEqual({ model: "openai/gpt-5.4", variant: "xhigh" });
+		expect(config.agents.gitCommitArchitect).toEqual({ model: "openai/gpt-5.4", variant: "xhigh" });
+		// existing agents are untouched
+		expect(config.agents.coordinator).toEqual({ model: "openai/gpt-5.2" });
+	});
+
+	it("does not overwrite agents already present in existing notion-agent-hive.json", async () => {
+		writeFileSync(
+			join(CONFIG_DIR, "notion-agent-hive.json"),
+			JSON.stringify({
+				agents: {
+					finalReviewer: { model: "custom/model" },
+					gitCommitArchitect: { model: "custom/model" },
+				},
+			}),
+		);
+
+		await install();
+
+		const config = readJson(join(CONFIG_DIR, "notion-agent-hive.json"));
+		expect(config.agents.finalReviewer.model).toBe("custom/model");
+		expect(config.agents.gitCommitArchitect.model).toBe("custom/model");
+	});
+
+	it("preserves unrecognized top-level keys when patching", async () => {
 		writeFileSync(join(CONFIG_DIR, "notion-agent-hive.json"), JSON.stringify({ custom: true }));
 
 		await install();
 
 		const config = readJson(join(CONFIG_DIR, "notion-agent-hive.json"));
 		expect(config.custom).toBe(true);
+		expect(config.agents.finalReviewer).toBeDefined();
+		expect(config.agents.gitCommitArchitect).toBeDefined();
 	});
 });

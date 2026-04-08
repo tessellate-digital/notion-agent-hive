@@ -75,11 +75,25 @@ export async function install(): Promise<void> {
 		console.log("  Plugin already registered");
 	}
 
-	// Create starter config if not exists
+	// Create starter config or patch existing one with any missing agents
 	const pluginConfigPath = join(directory, "notion-agent-hive.json");
+	const NEW_AGENTS = ["finalReviewer", "gitCommitArchitect"] as const;
 
 	if (existsSync(pluginConfigPath)) {
-		console.log("  notion-agent-hive.json already exists, skipping");
+		const existingConfig = JSON.parse(readFileSync(pluginConfigPath, "utf-8"));
+		const agents = existingConfig.agents ?? {};
+		const missing = NEW_AGENTS.filter((key) => !agents[key]);
+
+		if (missing.length > 0) {
+			for (const key of missing) {
+				agents[key] = createDefaultAgentConfig(key);
+			}
+			existingConfig.agents = agents;
+			writeFileSync(pluginConfigPath, `${JSON.stringify(existingConfig, null, 2)}\n`);
+			console.log(`  Patched notion-agent-hive.json: added ${missing.join(", ")}`);
+		} else {
+			console.log("  notion-agent-hive.json already up to date");
+		}
 	} else {
 		const starterConfig = {
 			$schema: `https://unpkg.com/${PACKAGE_NAME}@latest/schema.json`,
@@ -88,6 +102,8 @@ export async function install(): Promise<void> {
 				thinker: createDefaultAgentConfig("thinker"),
 				executor: createDefaultAgentConfig("executor"),
 				reviewer: createDefaultAgentConfig("reviewer"),
+				finalReviewer: createDefaultAgentConfig("finalReviewer"),
+				gitCommitArchitect: createDefaultAgentConfig("gitCommitArchitect"),
 			},
 			fallback: { enabled: true, chains: {} },
 		};

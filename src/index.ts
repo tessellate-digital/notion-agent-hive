@@ -54,12 +54,12 @@ export const NotionAgentHivePlugin: Plugin = async ({ directory }) => {
 			config.agents?.reviewer?.variant ?? DEFAULT_VARIANTS.reviewer,
 		),
 		createFinalReviewerAgent(
-			config.agents?.reviewer?.model ?? DEFAULT_MODELS.reviewer,
-			config.agents?.reviewer?.variant ?? DEFAULT_VARIANTS.reviewer,
+			config.agents?.finalReviewer?.model ?? DEFAULT_MODELS.finalReviewer,
+			config.agents?.finalReviewer?.variant ?? DEFAULT_VARIANTS.finalReviewer,
 		),
 		createGitCommitArchitectAgent(
-			config.agents?.reviewer?.model ?? DEFAULT_MODELS.reviewer,
-			config.agents?.reviewer?.variant ?? DEFAULT_VARIANTS.reviewer,
+			config.agents?.gitCommitArchitect?.model ?? DEFAULT_MODELS.gitCommitArchitect,
+			config.agents?.gitCommitArchitect?.variant ?? DEFAULT_VARIANTS.gitCommitArchitect,
 		),
 	];
 
