@@ -1,5 +1,6 @@
 // tests/agents.test.ts
 import { describe, expect, it } from "bun:test";
+import { version } from "../package.json";
 import { createCoordinatorAgent } from "../src/agents/coordinator";
 import { createExecutorAgent } from "../src/agents/executor";
 import { createReviewerAgent } from "../src/agents/reviewer";
@@ -34,7 +35,7 @@ describe("AgentDefinition", () => {
 describe("createCoordinatorAgent", () => {
 	it("creates agent with default config", () => {
 		const agent = createCoordinatorAgent();
-		expect(agent.name).toBe("notion agent hive");
+		expect(agent.name).toBe(`notion agent hive v${version}`);
 		expect(agent.config.prompt).toBeDefined();
 	});
 

@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { mkdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
+import { version } from "../package.json";
 import pluginModule, { NotionAgentHivePlugin } from "../src/index";
 
 const TEST_DIR = join(import.meta.dir, ".test-plugin-entry");
@@ -37,7 +38,7 @@ describe("plugin entry", () => {
 
 		await hooks.config?.(input);
 
-		expect(input.agent?.["notion agent hive"]).toMatchObject({ model: "openai/gpt-5.2" });
+		expect(input.agent?.[`notion agent hive v${version}`]).toMatchObject({ model: "openai/gpt-5.2" });
 		expect(input.agent?.["notion-thinker-planner"]).toMatchObject({
 			model: "openai/gpt-5.4",
 			variant: "xhigh",
