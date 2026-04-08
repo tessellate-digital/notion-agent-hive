@@ -1,6 +1,6 @@
 {
   "name": "@tesselate-digital/notion-agent-hive",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "provenance": true,
   "repository": {
     "type": "git",
@@ -14,7 +14,6 @@
   },
   "files": [
     "dist",
-    "prompts/dist",
     "schema.json",
     "README.md",
     "LICENSE"
@@ -24,8 +23,7 @@
     "provenance": true
   },
   "scripts": {
-    "build:prompts": "bun scripts/build-prompts.ts",
-    "build": "bun run build:prompts && bun build src/index.ts --outdir dist --target bun --format esm && bun build src/cli/index.ts --outdir dist/cli --target bun --format esm && tsc --emitDeclarationOnly",
+    "build": "bun build src/index.ts --outdir dist --target bun --format esm && bun build src/cli/index.ts --outdir dist/cli --target bun --format esm && tsc --emitDeclarationOnly",
     "test": "bun test",
     "lint": "biome lint .",
     "check": "biome check --write ."

@@ -1,12 +1,6 @@
 // src/agents/executor.ts
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import type { AgentDefinition } from "./types";
-
-const EXECUTOR_PROMPT = readFileSync(
-  join(import.meta.dir, "../../prompts/dist/executor.md"),
-  "utf-8"
-);
+import EXECUTOR_PROMPT from "../prompts/executor";
 
 export function createExecutorAgent(
 	model?: string | Array<string | { id: string; variant?: string }>,

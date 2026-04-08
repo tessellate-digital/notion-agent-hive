@@ -1,12 +1,6 @@
 // src/agents/thinker-refiner.ts
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import type { AgentDefinition } from "./types";
-
-const THINKER_REFINER_PROMPT = readFileSync(
-  join(import.meta.dir, "../../prompts/dist/thinker-refiner.md"),
-  "utf-8"
-);
+import THINKER_REFINER_PROMPT from "../prompts/thinker-refiner";
 
 export function createThinkerRefinerAgent(
   model?: string | Array<string | { id: string; variant?: string }>,
