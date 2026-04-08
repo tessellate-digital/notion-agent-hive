@@ -30,12 +30,16 @@ This uses Notion as a persistent memory layer and source of truth. Every feature
 
 Under the hood, the tool will synchronise a few specialised subagents:
 
-| Agent           | Role                                                                                                                                                                                 |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Coordinator** | Entry point. Manages the Notion board, creates feature pages and task tickets, dispatches subagents, and handles status transitions.                                                 |
-| **Thinker**     | Deep research and investigation. Interrogates users, explores the codebase, decomposes features into tasks. Returns structured reports to the coordinator. Never modifies the board. |
-| **Executor**    | Implements code for the specific ticket assigned by the Coordinator. Writes findings/work summaries on that ticket, then reports back; does not route itself to other tasks.         |
-| **Reviewer**    | Verifies implementations against acceptance criteria. Gates tasks for human review before they can be marked done.                                                                   |
+| Agent                    | Role                                                                                                                                                                                                          |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Coordinator**          | Entry point. Manages the Notion board, creates feature pages and task tickets, dispatches subagents, and handles all status transitions.                                                                       |
+| **Thinker — Planner**    | Deep research and feature decomposition. Interrogates users, explores the codebase, produces precise task specifications. Never modifies the board.                                                            |
+| **Thinker — Investigator** | Focused root-cause analysis. Dispatched when an executor gets blocked or a reviewer finds a design problem. Returns evidence-anchored findings.                                                              |
+| **Thinker — Refiner**    | Updates task specifications based on executor feedback, reviewer findings, or human comments. Ensures the spec is always the source of truth.                                                                  |
+| **Executor**             | Implements code for the specific ticket assigned by the coordinator. Runs a mandatory reuse scan before writing anything new — avoids duplicating existing utilities and types. Reports back with a verdict.   |
+| **Reviewer**             | Verifies implementations against acceptance criteria with evidence-anchored findings (every PASS/FAIL cites a file and line). Checks for code duplication. Gates tasks before human review.                   |
+| **Final Reviewer**       | Feature-level coherence review after all tasks pass individual review. Looks for integration gaps (A works, B works, A→B is broken), cross-task style drift, untested module seams, and cross-task duplication. |
+| **Git Commit Architect** | Crafts a coherent set of atomic commits when requested. Produces a plan first, waits for approval, then executes. Uses conventional commits. Never pushes.                                                     |
 
 It's quite flexible. Fire it with a rough idea, either inline or in a Notion page, and it will interactively create a plan. Give it an existing plan in Notion, and it will resume the work. Just like that, you get:
 
@@ -43,7 +47,9 @@ It's quite flexible. Fire it with a rough idea, either inline or in a Notion pag
 - **A proper space to review.** Leave comments on specific parts of the plan. Add notes. Give feedback where it matters, not in a chat thread that scrolls away.
 - **A proper space to supervise.** The board shows you exactly where everything stands at a glance.
 
-Each task runs with a fresh context, so you stay in the sweet spot where models perform best. When you want to review what an agent did, just look at the ticket: the work summary and QA report are right there.
+Each task runs with a fresh context, so you stay in the sweet spot where models perform best. When you want to review what an agent did, just look at the ticket: the work summary and QA report are right there, with evidence-anchored findings down to the file and line.
+
+A few hard rules are baked into every agent: no git write commands without explicit user approval, no moving tasks to Done (human only), no skipping review gates. The final reviewer exists specifically to catch what per-task reviews structurally cannot — integration gaps, cross-task style drift, and duplicated code that looked fine in isolation.
 
 It also saves money. You can assign a strong model for planning, a fast one for coordination, and a cheaper one for execution, since the thinking has already been done.
 

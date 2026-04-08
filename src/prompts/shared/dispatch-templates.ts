@@ -122,3 +122,38 @@ Return PASS if acceptable (task moves to Human Review).
 Return FAIL with specific feedback if changes needed (task returns to To Do).
 Write your review findings to the ticket's Notes field.
 \`\`\``;
+
+export const GIT_COMMIT_TEMPLATE = `### Git Commit Architect (GIT_COMMIT)
+
+Use when the user wants to commit changes.
+
+\`\`\`
+DISPATCH: GIT_COMMIT
+
+BOARD_ID: {{board_id}}
+FEATURE_TITLE: {{feature_title}}
+SCOPE: {{scope_description}}
+
+INSTRUCTIONS:
+Analyze all staged and unstaged changes. Group them into atomic,
+coherent commits. Return a GIT_COMMIT_PLAN before executing anything.
+Wait for coordinator approval before running any git write commands.
+\`\`\``;
+
+export const FINAL_REVIEW_TEMPLATE = `### Final Reviewer (FINAL_REVIEW)
+
+Use when the user requests a final review after all tasks are complete.
+
+\`\`\`
+DISPATCH: FINAL_REVIEW
+
+BOARD_ID: {{board_id}}
+FEATURE_PAGE_ID: {{feature_page_id}}
+TASK_IDS: {{task_ids}}
+
+INSTRUCTIONS:
+Review all changes for this feature holistically. Read every ticket and
+every changed file. Assess big-picture coherence — not per-task
+correctness, but whether the changes together form a complete, consistent
+whole that achieves the feature goal. Return FINAL_REVIEW_REPORT.
+\`\`\``;

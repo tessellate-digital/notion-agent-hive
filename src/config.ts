@@ -21,6 +21,8 @@ const PluginConfigSchema = z.object({
 			thinker: AgentConfigSchema.optional(),
 			executor: AgentConfigSchema.optional(),
 			reviewer: AgentConfigSchema.optional(),
+			finalReviewer: AgentConfigSchema.optional(),
+			gitCommitArchitect: AgentConfigSchema.optional(),
 		})
 		.strict()
 		.optional(),
@@ -39,6 +41,8 @@ export const DEFAULT_MODELS = {
 	thinker: "openai/gpt-5.4",
 	executor: "kimi-for-coding/k2p5",
 	reviewer: "openai/gpt-5.4",
+	finalReviewer: "openai/gpt-5.4",
+	gitCommitArchitect: "openai/gpt-5.4",
 } as const;
 
 export const DEFAULT_VARIANTS = {
@@ -46,6 +50,8 @@ export const DEFAULT_VARIANTS = {
 	thinker: "xhigh",
 	executor: undefined,
 	reviewer: "xhigh",
+	finalReviewer: "xhigh",
+	gitCommitArchitect: "xhigh",
 } as const;
 
 const CONFIG_FILENAME = "notion-agent-hive.json";

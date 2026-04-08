@@ -101,6 +101,19 @@ describe("loadConfig", () => {
 		// invalid config is skipped gracefully
 		expect(config.agents).toBeUndefined();
 	});
+
+	it("accepts finalReviewer and gitCommitArchitect in config schema", () => {
+		writeJson(PROJECT_DIR, "notion-agent-hive.json", {
+			agents: {
+				finalReviewer: { model: "anthropic/claude-opus-4", variant: "xhigh" },
+				gitCommitArchitect: { model: "openai/gpt-5.4" },
+			},
+		});
+		const config = loadConfig(PROJECT_DIR);
+		expect(config.agents?.finalReviewer?.model).toBe("anthropic/claude-opus-4");
+		expect(config.agents?.finalReviewer?.variant).toBe("xhigh");
+		expect(config.agents?.gitCommitArchitect?.model).toBe("openai/gpt-5.4");
+	});
 });
 
 describe("getGlobalConfigDir", () => {
@@ -128,11 +141,13 @@ describe("getGlobalConfigDir", () => {
 });
 
 describe("DEFAULT_MODELS", () => {
-	it("has defaults for all four agents", () => {
+	it("has defaults for all agents", () => {
 		expect(DEFAULT_MODELS.coordinator).toBeDefined();
 		expect(DEFAULT_MODELS.thinker).toBeDefined();
 		expect(DEFAULT_MODELS.executor).toBeDefined();
 		expect(DEFAULT_MODELS.reviewer).toBeDefined();
+		expect(DEFAULT_MODELS.finalReviewer).toBeDefined();
+		expect(DEFAULT_MODELS.gitCommitArchitect).toBeDefined();
 	});
 
 	it("uses the expected starter defaults", () => {
@@ -140,9 +155,13 @@ describe("DEFAULT_MODELS", () => {
 		expect(DEFAULT_MODELS.thinker).toBe("openai/gpt-5.4");
 		expect(DEFAULT_MODELS.executor).toBe("kimi-for-coding/k2p5");
 		expect(DEFAULT_MODELS.reviewer).toBe("openai/gpt-5.4");
+		expect(DEFAULT_MODELS.finalReviewer).toBe("openai/gpt-5.4");
+		expect(DEFAULT_MODELS.gitCommitArchitect).toBe("openai/gpt-5.4");
 		expect(DEFAULT_VARIANTS.coordinator).toBeUndefined();
 		expect(DEFAULT_VARIANTS.thinker).toBe("xhigh");
 		expect(DEFAULT_VARIANTS.executor).toBeUndefined();
 		expect(DEFAULT_VARIANTS.reviewer).toBe("xhigh");
+		expect(DEFAULT_VARIANTS.finalReviewer).toBe("xhigh");
+		expect(DEFAULT_VARIANTS.gitCommitArchitect).toBe("xhigh");
 	});
 });
