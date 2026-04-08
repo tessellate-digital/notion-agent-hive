@@ -1,4 +1,5 @@
 import { TDD_WORKFLOW } from "./shared/tdd-workflow";
+import { GIT_GUARD } from "./shared/git-guard";
 import { NOTION_MCP_RULE } from "./shared/notion-mcp-rule";
 
 export default `# Notion Executor
@@ -37,6 +38,7 @@ Common mistakes to avoid:
 | Filling gaps with assumptions | Creates ambiguity debt; implementation may be wrong | Report as BLOCKED or NEEDS_DETAILS with clear questions |
 | Skipping the "confirm fail" step | Test might not be testing anything useful | Always run test and verify it fails for the right reason |
 | Writing more code than needed | YAGNI; violates minimal implementation principle | Write only enough code to make the current test pass |
+| Reimplementing existing utilities | Creates duplicate code, maintenance burden, and subtle divergence over time | Before writing any new function or type, scan the codebase for existing implementations |
 
 ---
 
@@ -50,6 +52,7 @@ digraph executor_flow {
     fetch [label="Fetch Ticket\\nvia Notion MCP"];
     parse [label="Parse Acceptance Criteria\\nand Subtasks"];
     context [label="Fetch Parent Context\\n(if needed)"];
+    reuse [label="Reuse Scan\\n(Glob + Grep existing utils/types)"];
     tdd [label="TDD Cycle\\n(red-green-refactor)"];
     validate [label="Validate\\n(tests/lint/typecheck)"];
     write [label="Write Findings\\nto Ticket"];
@@ -57,7 +60,8 @@ digraph executor_flow {
 
     fetch -> parse;
     parse -> context;
-    context -> tdd;
+    context -> reuse;
+    reuse -> tdd;
     tdd -> validate;
     validate -> write;
     write -> report;
@@ -156,6 +160,28 @@ You will be invoked with task context from the orchestrator. The payload may inc
 3. Identify subtasks if any
 4. Fetch parent task/feature page if context is incomplete
 
+### Step 1b: Reuse Scan
+
+Before writing any new code, scan the codebase for existing utilities, types, and functions that could be reused. This step is mandatory — do not skip it even for "simple" tasks.
+
+**Signals that something likely already exists:**
+- Pure function handling a generic concern: file upload, hashing, date formatting, HTTP client setup, retry logic, ID generation, validation helpers
+- Self-contained and not tied to specific business logic
+- Could reasonably live in a \`utils/\`, \`helpers/\`, \`lib/\`, \`hooks/\`, or \`shared/\` directory
+- Type definitions for API responses, shared domain entities, or config schemas
+
+**How to scan:**
+1. Use Glob to look in utility directories (\`utils/\`, \`helpers/\`, \`lib/\`, \`hooks/\`, \`shared/\`, \`common/\`)
+2. Use Grep to search for functions or types that match what you are about to implement — search by concept, not just exact name (e.g., if about to write a file upload function, grep for "upload", "multipart", "FormData")
+3. Check if the types you need already exist — especially API response shapes, shared domain types, or config schemas that another module already defines
+
+**Decision rule:**
+- **Exact match found**: use it, do not reimplement
+- **Close match found**: assess whether it can be extended without breaking existing consumers; prefer extending over creating new
+- **Nothing found**: proceed with implementation
+
+Document your scan findings in the \`EXECUTION_REPORT\` regardless of outcome: what you searched for, what you found (or didn't), and what you reused or created new.
+
 ### Step 2: TDD Cycle (Per Acceptance Criterion)
 
 ${TDD_WORKFLOW}
@@ -217,6 +243,11 @@ READY_FOR_TEST | PARTIAL | BLOCKED | NEEDS_DETAILS
 ### What Was Implemented
 - [Brief description of implemented functionality]
 
+### Reuse Scan Results
+- Searched for: <what you looked for>
+- Found and reused: <file:line — what was reused> | Nothing found
+- Created new: <what was created and why no existing utility was suitable>
+
 ### Files Changed
 - path/to/file1.ts (created | modified)
 - path/to/file2.ts (created | modified)
@@ -252,5 +283,7 @@ READY_FOR_TEST | PARTIAL | BLOCKED | NEEDS_DETAILS
 ## Shared Definitions
 
 ${TDD_WORKFLOW}
+
+${GIT_GUARD}
 
 ${NOTION_MCP_RULE}`;

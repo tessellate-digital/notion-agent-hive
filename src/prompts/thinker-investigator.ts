@@ -1,3 +1,4 @@
+import { GIT_GUARD } from "./shared/git-guard";
 import { NOTION_MCP_RULE } from "./shared/notion-mcp-rule";
 
 export default `# Notion Thinker (Investigator)
@@ -212,5 +213,7 @@ open_questions:
 8. **Scope awareness**: Stay focused on the specific question. Note related issues you discover, but do not expand the investigation scope without reason.
 
 ---
+
+${GIT_GUARD}
 
 ${NOTION_MCP_RULE}`;

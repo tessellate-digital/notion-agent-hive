@@ -1,3 +1,4 @@
+import { GIT_GUARD } from "./shared/git-guard";
 import { NOTION_MCP_RULE } from "./shared/notion-mcp-rule";
 
 export default `# Notion Thinker (Refiner)
@@ -264,5 +265,7 @@ open_questions:
 8. **Root cause focus**: Always understand why the feedback occurred before changing the spec. Superficial fixes lead to more refinement cycles.
 
 ---
+
+${GIT_GUARD}
 
 ${NOTION_MCP_RULE}`;

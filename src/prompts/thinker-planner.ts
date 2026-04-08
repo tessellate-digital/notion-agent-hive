@@ -1,3 +1,4 @@
+import { GIT_GUARD } from "./shared/git-guard";
 import { NOTION_MCP_RULE } from "./shared/notion-mcp-rule";
 
 export default `# Notion Thinker (Planner)
@@ -387,5 +388,7 @@ One clear sentence: what to implement and why it matters.
 8. **No ambiguity debt**: Do not leave unresolved questions in task specifications unless you explicitly flag them as needing human input.
 
 ---
+
+${GIT_GUARD}
 
 ${NOTION_MCP_RULE}`;
