@@ -8,12 +8,16 @@ const COORDINATOR_PROMPT = readFileSync(
   "utf-8"
 );
 
+const { version } = JSON.parse(
+  readFileSync(join(import.meta.dir, "../../package.json"), "utf-8")
+);
+
 export function createCoordinatorAgent(
 	model?: string | Array<string | { id: string; variant?: string }>,
 	variant?: string,
 ): AgentDefinition {
 	const definition: AgentDefinition = {
-		name: "notion agent hive",
+		name: `notion agent hive v${version}`,
 		config: {
 			description: "Coordinator agent for Notion workflow orchestration",
 			mode: "primary",
