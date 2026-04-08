@@ -38,7 +38,15 @@ describe("plugin entry", () => {
 		await hooks.config?.(input);
 
 		expect(input.agent?.["notion agent hive"]).toMatchObject({ model: "openai/gpt-5.2" });
-		expect(input.agent?.["notion-thinker"]).toMatchObject({
+		expect(input.agent?.["notion-thinker-planner"]).toMatchObject({
+			model: "openai/gpt-5.4",
+			variant: "xhigh",
+		});
+		expect(input.agent?.["notion-thinker-investigator"]).toMatchObject({
+			model: "openai/gpt-5.4",
+			variant: "xhigh",
+		});
+		expect(input.agent?.["notion-thinker-refiner"]).toMatchObject({
 			model: "openai/gpt-5.4",
 			variant: "xhigh",
 		});
