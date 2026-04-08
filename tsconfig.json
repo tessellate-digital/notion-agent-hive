@@ -10,7 +10,8 @@
     "declarationDir": "dist",
     "outDir": "dist",
     "rootDir": "src",
-    "types": ["@types/bun"]
+    "types": ["@types/bun"],
+    "resolveJsonModule": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "tests"]

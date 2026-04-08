@@ -1,10 +1,10 @@
-## TDD Workflow
+export const TDD_WORKFLOW = `## TDD Workflow
 
 <HARD-GATE>
 You MUST follow red-green-refactor for all code changes. No exceptions for "simple" or "trivial" changes.
 </HARD-GATE>
 
-```dot
+\`\`\`dot
 digraph tdd {
     rankdir=LR;
     node [shape=box];
@@ -19,7 +19,7 @@ digraph tdd {
     "Confirm PASS" -> "Commit" [label="clean"];
     "Commit" -> "Write failing test" [label="next behavior", style=dashed];
 }
-```
+\`\`\`
 
 ### The Cycle
 
@@ -35,4 +35,4 @@ digraph tdd {
 - **Writing implementation before tests**: You lose the safety net. The test might pass for the wrong reason.
 - **Writing multiple tests before implementing**: You lose focus. One test, one behavior.
 - **Writing more code than needed to pass**: YAGNI. The next test will drive the next behavior.
-- **Skipping the "confirm fail" step**: If the test passes before implementation, it's not testing anything useful.
+- **Skipping the "confirm fail" step**: If the test passes before implementation, it's not testing anything useful.`;

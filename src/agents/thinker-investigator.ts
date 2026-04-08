@@ -1,12 +1,6 @@
 // src/agents/thinker-investigator.ts
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import type { AgentDefinition } from "./types";
-
-const THINKER_INVESTIGATOR_PROMPT = readFileSync(
-  join(import.meta.dir, "../../prompts/dist/thinker-investigator.md"),
-  "utf-8"
-);
+import THINKER_INVESTIGATOR_PROMPT from "../prompts/thinker-investigator";
 
 export function createThinkerInvestigatorAgent(
   model?: string | Array<string | { id: string; variant?: string }>,

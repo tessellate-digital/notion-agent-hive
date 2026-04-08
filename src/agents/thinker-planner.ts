@@ -1,12 +1,6 @@
 // src/agents/thinker-planner.ts
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import type { AgentDefinition } from "./types";
-
-const THINKER_PLANNER_PROMPT = readFileSync(
-  join(import.meta.dir, "../../prompts/dist/thinker-planner.md"),
-  "utf-8"
-);
+import THINKER_PLANNER_PROMPT from "../prompts/thinker-planner";
 
 export function createThinkerPlannerAgent(
   model?: string | Array<string | { id: string; variant?: string }>,

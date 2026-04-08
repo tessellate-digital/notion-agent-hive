@@ -1,16 +1,9 @@
 // src/agents/coordinator.ts
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import type { AgentDefinition } from "./types";
+import COORDINATOR_PROMPT from "../prompts/coordinator";
+import packageJson from "../../package.json";
 
-const COORDINATOR_PROMPT = readFileSync(
-  join(import.meta.dir, "../../prompts/dist/coordinator.md"),
-  "utf-8"
-);
-
-const { version } = JSON.parse(
-  readFileSync(join(import.meta.dir, "../../package.json"), "utf-8")
-);
+const { version } = packageJson;
 
 export function createCoordinatorAgent(
 	model?: string | Array<string | { id: string; variant?: string }>,
