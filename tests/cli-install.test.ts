@@ -77,7 +77,9 @@ describe("install", () => {
     await install();
 
     const config = readJson(join(CONFIG_DIR, "opencode.json"));
-    expect(config.plugin).toEqual(["other-plugin", "notion-agent-hive"]);
+    expect(config.plugin).toHaveLength(2);
+    expect(config.plugin).toContain("other-plugin");
+    expect(config.plugin.find((p: string) => p.startsWith("@tesselate-digital/notion-agent-hive"))).toMatch(/@tesselate-digital\/notion-agent-hive@\d+\.\d+\.\d+/);
     expect(config.plugins).toBeUndefined();
   });
 
@@ -91,7 +93,7 @@ describe("install", () => {
 
 		const config = readJson(join(CONFIG_DIR, "opencode.json"));
 		expect(
-			config.plugin.filter((p: string) => p === "@tesselate-digital/notion-agent-hive"),
+			config.plugin.filter((p: string) => p.startsWith("@tesselate-digital/notion-agent-hive")),
 		).toHaveLength(1);
 	});
 
@@ -104,7 +106,8 @@ describe("install", () => {
     await install();
 
     const config = readJson(join(CONFIG_DIR, "opencode.json"));
-    expect(config.plugin).toEqual(["notion-agent-hive"]);
+    expect(config.plugin).toHaveLength(1);
+    expect(config.plugin[0]).toMatch(/@tesselate-digital\/notion-agent-hive@\d+\.\d+\.\d+/);
   });
 
   it("does not duplicate plugin entry when versioned entry exists", async () => {
@@ -117,8 +120,9 @@ describe("install", () => {
 
     const config = readJson(join(CONFIG_DIR, "opencode.json"));
     expect(config.plugin).toHaveLength(1);
-    // Should preserve the existing version
-    expect(config.plugin[0]).toBe("@tesselate-digital/notion-agent-hive@0.2.0");
+    // Should update to the installed version, not preserve the previously declared version
+    expect(config.plugin[0]).toMatch(/@tesselate-digital\/notion-agent-hive@\d+\.\d+\.\d+/);
+    expect(config.plugin[0]).not.toBe("@tesselate-digital/notion-agent-hive@0.2.0");
   });
 
   it("removes versioned duplicate when both versioned and unversioned exist", async () => {
