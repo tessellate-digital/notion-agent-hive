@@ -4,54 +4,62 @@ import { join } from "node:path";
 import { z } from "zod";
 
 const AgentModelSchema = z.union([
-	z.string(),
-	z.array(z.union([z.string(), z.object({ id: z.string(), variant: z.string().optional() })])),
+  z.string(),
+  z.array(
+    z.union([
+      z.string(),
+      z.object({ id: z.string(), variant: z.string().optional() }),
+    ]),
+  ),
 ]);
 
 const AgentConfigSchema = z.object({
-	model: AgentModelSchema.optional(),
-	variant: z.string().optional(),
+  model: AgentModelSchema.optional(),
+  variant: z.string().optional(),
 });
 
 const PluginConfigSchema = z.object({
-	$schema: z.string().optional(),
-	agents: z
-		.object({
-			coordinator: AgentConfigSchema.optional(),
-			thinker: AgentConfigSchema.optional(),
-			executor: AgentConfigSchema.optional(),
-			reviewer: AgentConfigSchema.optional(),
-			finalReviewer: AgentConfigSchema.optional(),
-			gitCommitArchitect: AgentConfigSchema.optional(),
-		})
-		.strict()
-		.optional(),
-	fallback: z
-		.object({
-			enabled: z.boolean().optional(),
-			chains: z.record(z.array(z.string())).optional(),
-		})
-		.optional(),
+  $schema: z.string().optional(),
+  agents: z
+    .object({
+      coordinator: AgentConfigSchema.optional(),
+      thinker: AgentConfigSchema.optional(),
+      executor: AgentConfigSchema.optional(),
+      reviewer: AgentConfigSchema.optional(),
+      finalReviewer: AgentConfigSchema.optional(),
+      gitCommitArchitect: AgentConfigSchema.optional(),
+      prReviewer: AgentConfigSchema.optional(),
+    })
+    .strict()
+    .optional(),
+  fallback: z
+    .object({
+      enabled: z.boolean().optional(),
+      chains: z.record(z.array(z.string())).optional(),
+    })
+    .optional(),
 });
 
 export type PluginConfig = z.infer<typeof PluginConfigSchema>;
 
 export const DEFAULT_MODELS = {
-	coordinator: "openai/gpt-5.2",
-	thinker: "openai/gpt-5.4",
-	executor: "kimi-for-coding/k2p5",
-	reviewer: "openai/gpt-5.4",
-	finalReviewer: "openai/gpt-5.4",
-	gitCommitArchitect: "openai/gpt-5.4",
+  coordinator: "openai/gpt-5.2",
+  thinker: "openai/gpt-5.4",
+  executor: "kimi-for-coding/k2p5",
+  reviewer: "openai/gpt-5.4",
+  finalReviewer: "openai/gpt-5.4",
+  gitCommitArchitect: "openai/gpt-5.4",
+  prReviewer: "openai/gpt-5.4",
 } as const;
 
 export const DEFAULT_VARIANTS = {
-	coordinator: undefined,
-	thinker: "xhigh",
-	executor: undefined,
-	reviewer: "xhigh",
-	finalReviewer: "xhigh",
-	gitCommitArchitect: "xhigh",
+  coordinator: undefined,
+  thinker: "xhigh",
+  executor: undefined,
+  reviewer: "xhigh",
+  finalReviewer: "xhigh",
+  gitCommitArchitect: "xhigh",
+  prReviewer: "xhigh",
 } as const;
 
 const CONFIG_FILENAME = "notion-agent-hive.json";
@@ -61,42 +69,45 @@ const CONFIG_FILENAME = "notion-agent-hive.json";
  * Order: OPENCODE_CONFIG_DIR > XDG_CONFIG_HOME/opencode > ~/.config/opencode
  */
 export function getGlobalConfigDir(): string {
-	if (process.env.OPENCODE_CONFIG_DIR?.trim()) {
-		return process.env.OPENCODE_CONFIG_DIR.trim();
-	}
-	const xdg = process.env.XDG_CONFIG_HOME?.trim();
-	return join(xdg || join(homedir(), ".config"), "opencode");
+  if (process.env.OPENCODE_CONFIG_DIR?.trim()) {
+    return process.env.OPENCODE_CONFIG_DIR.trim();
+  }
+  const xdg = process.env.XDG_CONFIG_HOME?.trim();
+  return join(xdg || join(homedir(), ".config"), "opencode");
 }
 
 function readConfig(filePath: string): PluginConfig | null {
-	if (!existsSync(filePath)) return null;
-	try {
-		const parsed = JSON.parse(readFileSync(filePath, "utf-8"));
-		const result = PluginConfigSchema.safeParse(parsed);
-		if (!result.success) {
-			console.warn(`[notion-agent-hive] Invalid config at ${filePath}:`, result.error.format());
-			return null;
-		}
-		return result.data;
-	} catch {
-		return null;
-	}
+  if (!existsSync(filePath)) return null;
+  try {
+    const parsed = JSON.parse(readFileSync(filePath, "utf-8"));
+    const result = PluginConfigSchema.safeParse(parsed);
+    if (!result.success) {
+      console.warn(
+        `[notion-agent-hive] Invalid config at ${filePath}:`,
+        result.error.format(),
+      );
+      return null;
+    }
+    return result.data;
+  } catch {
+    return null;
+  }
 }
 
 function deepMerge(base: PluginConfig, override: PluginConfig): PluginConfig {
-	return {
-		...base,
-		...override,
-		agents: { ...base.agents, ...override.agents },
-		fallback:
-			base.fallback || override.fallback
-				? {
-						...base.fallback,
-						...override.fallback,
-						chains: { ...base.fallback?.chains, ...override.fallback?.chains },
-					}
-				: undefined,
-	};
+  return {
+    ...base,
+    ...override,
+    agents: { ...base.agents, ...override.agents },
+    fallback:
+      base.fallback || override.fallback
+        ? {
+            ...base.fallback,
+            ...override.fallback,
+            chains: { ...base.fallback?.chains, ...override.fallback?.chains },
+          }
+        : undefined,
+  };
 }
 
 /**
@@ -109,12 +120,12 @@ function deepMerge(base: PluginConfig, override: PluginConfig): PluginConfig {
  * thinker model is not overwritten by a project config that only sets executor.
  */
 export function loadConfig(directory: string): PluginConfig {
-	const globalConfig = readConfig(join(getGlobalConfigDir(), CONFIG_FILENAME));
-	const projectConfig = readConfig(join(directory, CONFIG_FILENAME));
+  const globalConfig = readConfig(join(getGlobalConfigDir(), CONFIG_FILENAME));
+  const projectConfig = readConfig(join(directory, CONFIG_FILENAME));
 
-	if (!globalConfig || !projectConfig) {
-		return globalConfig ?? projectConfig ?? {};
-	}
+  if (!globalConfig || !projectConfig) {
+    return globalConfig ?? projectConfig ?? {};
+  }
 
-	return deepMerge(globalConfig, projectConfig);
+  return deepMerge(globalConfig, projectConfig);
 }

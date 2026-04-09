@@ -38,7 +38,9 @@ describe("plugin entry", () => {
 
 		await hooks.config?.(input);
 
-		expect(input.agent?.[`notion agent hive v${version}`]).toMatchObject({ model: "openai/gpt-5.2" });
+		expect(input.agent?.[`notion agent hive v${version}`]).toMatchObject({
+			model: "openai/gpt-5.2",
+		});
 		expect(input.agent?.["notion-thinker-planner"]).toMatchObject({
 			model: "openai/gpt-5.4",
 			variant: "xhigh",
@@ -53,6 +55,10 @@ describe("plugin entry", () => {
 		});
 		expect(input.agent?.["notion-executor"]).toMatchObject({ model: "kimi-for-coding/k2p5" });
 		expect(input.agent?.["notion-reviewer"]).toMatchObject({
+			model: "openai/gpt-5.4",
+			variant: "xhigh",
+		});
+		expect(input.agent?.["notion-pr-reviewer"]).toMatchObject({
 			model: "openai/gpt-5.4",
 			variant: "xhigh",
 		});
