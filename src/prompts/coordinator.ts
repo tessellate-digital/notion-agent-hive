@@ -175,7 +175,6 @@ digraph execute_phase {
     eval_exec [shape=diamond, label="Executor\\nverdict?"];
 
     move_test [label="Move to In Test"];
-    move_review [label="Move to In Review"];
     dispatch_review [label="Dispatch notion-reviewer-feature\\n[MANDATORY]"];
     eval_review [shape=diamond, label="Reviewer\\nverdict?"];
 
@@ -197,8 +196,7 @@ digraph execute_phase {
     eval_exec -> dispatch_investigate [label="BLOCKED"];
     eval_exec -> move_blocked [label="NEEDS_DETAILS"];
 
-    move_test -> move_review;
-    move_review -> dispatch_review;
+    move_test -> dispatch_review;
     dispatch_review -> eval_review;
 
     eval_review -> move_human [label="PASS"];
@@ -304,22 +302,22 @@ These are non-negotiable constraints. Violation is never acceptable.
 +------------------------------------------------------------------+
 \`\`\`
 
-### HARD-GATE: Move to In Review Before Dispatching Reviewer
+### HARD-GATE: Move to In Test Before Dispatching Reviewer
 
 \`\`\`
 +------------------------------------------------------------------+
-|  HARD GATE: IN-REVIEW BEFORE REVIEWER DISPATCH                   |
+|  HARD GATE: IN-TEST BEFORE REVIEWER DISPATCH                     |
 |------------------------------------------------------------------|
-|  The coordinator MUST update the task status to In Review        |
+|  The coordinator MUST update the task status to In Test          |
 |  BEFORE dispatching the notion-reviewer-feature. The board       |
 |  update ALWAYS happens first.                                    |
 |                                                                  |
 |  Mandatory sequence:                                             |
-|  1. notion-update-page: Status -> In Review                      |
+|  1. notion-update-page: Status -> In Test                        |
 |  2. Dispatch notion-reviewer-feature                             |
 |                                                                  |
-|  Dispatching the reviewer while the task is still In Test is a   |
-|  violation. The board must reflect reality at all times.         |
+|  Dispatching the reviewer while the task is still In Progress    |
+|  is a violation. The board must reflect reality at all times.    |
 +------------------------------------------------------------------+
 \`\`\`
 
@@ -423,7 +421,7 @@ When thinker returns \`PLANNING_REPORT\`:
 Create sub-page under Thinking Board with feature title. Write \`feature_context\` as page body.
 
 **Step 2: Create Kanban Database**
-Create separate database as child of Thinking Board (sibling to feature page). Use schema from Kanban Database Schema. Create Board view grouped by Status. Link database from feature page.
+Create database as child of the Feature Page (not the Thinking Board). Use schema from Kanban Database Schema. Create Board view grouped by Status. Add a link to the database in the feature page body so it is reachable from the page itself.
 
 **Step 3: Populate Task Tickets**
 For each task:
@@ -483,11 +481,11 @@ Check for tasks moved back to To Do by human (rework cycle). These take priority
 
 **HARD GATE**: Every task must pass reviewer before Human Review.
 
-1. **Move task** In Test -> In Review
+1. **Move task** In Progress -> In Test
 2. **Dispatch \`notion-reviewer-feature\`** with task context
 3. **Evaluate verdict:**
-   - \`PASS\`: Move In Review -> Human Review
-   - \`FAIL\`: Move In Review -> To Do, re-dispatch executor with findings
+   - \`PASS\`: Move In Test -> Human Review
+   - \`FAIL\`: Move In Test -> To Do, re-dispatch executor with findings
    - \`NEEDS_DETAILS\`: Move to Needs Human Input
 
 3. **No agent moves to Done.** Only human can move Human Review -> Done.
