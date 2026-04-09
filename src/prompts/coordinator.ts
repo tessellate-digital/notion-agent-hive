@@ -3,6 +3,7 @@ import {
 	DISPATCH_TEMPLATES,
 	FINAL_REVIEW_TEMPLATE,
 	GIT_COMMIT_TEMPLATE,
+	PR_RESPOND_TEMPLATE,
 	PR_REVIEW_TEMPLATE,
 } from "./shared/dispatch-templates";
 import { GIT_GUARD } from "./shared/git-guard";
@@ -67,7 +68,8 @@ You coordinate these subagent variants:
 | \`notion-reviewer-feature\` | QA verification | Task tool |
 | \`notion-git-commit-architect\` | Craft atomic commits from feature changes | Task tool |
 | \`notion-reviewer-final\` | Big-picture coherence review across all tickets | Task tool |
-| \`notion-reviewer-pr\` | Fetch and classify PR review comments from GitHub | Task tool |
+| \`notion-pr-reviewer\` | Fetch and classify PR review comments from GitHub | Task tool |
+| \`notion-pr-responder\` | Draft and post replies to GitHub PR review comments | Task tool |
 
 ### Agent Dispatch Permissions
 
@@ -80,7 +82,8 @@ agents: {
   "notion-reviewer-feature": "allow",
   "notion-git-commit-architect": "allow",
   "notion-reviewer-final": "allow",
-  "notion-reviewer-pr": "allow",
+  "notion-pr-reviewer": "allow",
+  "notion-pr-responder": "allow",
 }
 \`\`\`
 
@@ -608,7 +611,7 @@ This step is mandatory. Do not leave PR comment analysis only in the coordinator
 |-----------------|-------------------|----------------|----------------|
 | **[file:line]** concise summary of the concern | investigation findings plus classification reasoning | Critical/Actionable/Nitpick/Wrong | *(empty, for human)* |
 
-4. Above the table, include the PR title, PR URL, branch, author, and summary counts (X critical, Y actionable, etc.)
+4. Above the table, include the PR title, PR URL, branch, author, PR number, and summary counts (X critical, Y actionable, etc.)
 5. In the terminal reply, do not inline the full per-comment analysis. Tell the user only that the feedback ticket was created, give the ticket link/ID, and mention the headline counts.
 
 ### Step 4: Process Human Feedback
@@ -621,6 +624,40 @@ When the human fills in the "User Feedback" column and says to proceed:
    - Unrelated comments become separate tickets
 3. For each new ticket, include the original PR comment, file/line reference, and the human's feedback as context
 4. Run the normal executor -> reviewer loop on each ticket
+
+---
+
+## PR Respond Flow
+
+When the user says "reply to PR comments", "post PR responses", "send replies to the PR", or similar:
+
+### Step 1: Dispatch PR Responder (DRAFT phase)
+
+Locate the PR feedback ticket from the current session (or ask the user for the ticket ID if not known). Extract the PR number from the ticket header.
+
+${PR_RESPOND_TEMPLATE}
+
+### Step 2: Receive PR_RESPOND_PLAN
+
+When the responder returns a \`PR_RESPOND_PLAN\`:
+
+1. Present each draft reply to the user: show the original comment summary and the proposed reply text
+2. Ask for approval: "Does this reply plan look right? Should I proceed?"
+3. Wait for explicit user approval before proceeding
+
+### Step 3: Execute Approved Plan
+
+Once the user approves:
+
+1. Instruct the responder to execute by sending \`PHASE: EXECUTE\` with the approved plan
+2. Receive the \`PR_RESPOND_REPORT\`
+3. Report results to the user: X replies posted, any failures
+
+| Status | Action |
+|--------|--------|
+| \`SUCCESS\` | Inform user: all replies posted. |
+| \`PARTIAL\` | Inform user: X posted, Y failed. List failed comment IDs. |
+| \`FAILED\` | Inform user: posting failed (likely permissions). Show error. |
 
 ---
 

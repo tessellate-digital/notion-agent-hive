@@ -29,7 +29,8 @@ export function createCoordinatorAgent(
 				"notion-reviewer-feature": "allow",
 				"notion-reviewer-final": "allow",
 				"notion-git-commit-architect": "allow",
-				"notion-reviewer-pr": "allow",
+				"notion-pr-reviewer": "allow",
+				"notion-pr-responder": "allow",
 			},
 		},
 	};

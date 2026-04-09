@@ -1,7 +1,8 @@
 import { createCoordinatorAgent } from "./agents/coordinator";
 import { createExecutorAgent } from "./agents/executor";
 import { createGitCommitArchitectAgent } from "./agents/git-commit-architect";
-import { createPrReviewerAgent } from "./agents/reviewer/pr";
+import { createPrReviewerAgent } from "./agents/pr/reviewer";
+import { createPrResponderAgent } from "./agents/pr/responder";
 import { createReviewerAgent } from "./agents/reviewer/feature";
 import { createFinalReviewerAgent } from "./agents/reviewer/final";
 import { createThinkerInvestigatorAgent } from "./agents/thinker/investigator";
@@ -22,7 +23,8 @@ export { createExecutorAgent } from "./agents/executor";
 export { createReviewerAgent } from "./agents/reviewer/feature";
 export { createFinalReviewerAgent } from "./agents/reviewer/final";
 export { createGitCommitArchitectAgent } from "./agents/git-commit-architect";
-export { createPrReviewerAgent } from "./agents/reviewer/pr";
+export { createPrReviewerAgent } from "./agents/pr/reviewer";
+export { createPrResponderAgent } from "./agents/pr/responder";
 export { ForegroundFallbackManager } from "./fallback";
 
 import type { Plugin } from "@opencode-ai/plugin";
@@ -68,6 +70,10 @@ export const NotionAgentHivePlugin: Plugin = async ({ directory }) => {
     createPrReviewerAgent(
       config.agents?.prReviewer?.model ?? DEFAULT_MODELS.prReviewer,
       config.agents?.prReviewer?.variant ?? DEFAULT_VARIANTS.prReviewer,
+    ),
+    createPrResponderAgent(
+      config.agents?.prResponder?.model ?? DEFAULT_MODELS.prResponder,
+      config.agents?.prResponder?.variant ?? DEFAULT_VARIANTS.prResponder,
     ),
   ];
 

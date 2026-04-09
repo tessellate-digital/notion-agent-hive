@@ -125,6 +125,16 @@ describe("loadConfig", () => {
 		expect(config.agents?.prReviewer?.model).toBe("openai/gpt-5.4");
 		expect(config.agents?.prReviewer?.variant).toBe("xhigh");
 	});
+
+	it("accepts prResponder in config schema", () => {
+		writeJson(PROJECT_DIR, "notion-agent-hive.json", {
+			agents: {
+				prResponder: { model: "github-copilot/claude-sonnet-4.6" },
+			},
+		});
+		const config = loadConfig(PROJECT_DIR);
+		expect(config.agents?.prResponder?.model).toBe("github-copilot/claude-sonnet-4.6");
+	});
 });
 
 describe("getGlobalConfigDir", () => {
@@ -160,22 +170,25 @@ describe("DEFAULT_MODELS", () => {
 		expect(DEFAULT_MODELS.finalReviewer).toBeDefined();
 		expect(DEFAULT_MODELS.gitCommitArchitect).toBeDefined();
 		expect(DEFAULT_MODELS.prReviewer).toBeDefined();
+		expect(DEFAULT_MODELS.prResponder).toBeDefined();
 	});
 
 	it("uses the expected starter defaults", () => {
-		expect(DEFAULT_MODELS.coordinator).toBe("openai/gpt-5.2");
+		expect(DEFAULT_MODELS.coordinator).toBe("github-copilot/claude-sonnet-4.6");
 		expect(DEFAULT_MODELS.thinker).toBe("openai/gpt-5.4");
-		expect(DEFAULT_MODELS.executor).toBe("kimi-for-coding/k2p5");
-		expect(DEFAULT_MODELS.reviewer).toBe("openai/gpt-5.4");
+		expect(DEFAULT_MODELS.executor).toBe("github-copilot/claude-sonnet-4.6");
+		expect(DEFAULT_MODELS.reviewer).toBe("github-copilot/claude-opus-4.6");
 		expect(DEFAULT_MODELS.finalReviewer).toBe("openai/gpt-5.4");
-		expect(DEFAULT_MODELS.gitCommitArchitect).toBe("openai/gpt-5.4");
-		expect(DEFAULT_MODELS.prReviewer).toBe("openai/gpt-5.4");
+		expect(DEFAULT_MODELS.gitCommitArchitect).toBe("github-copilot/claude-opus-4.6");
+		expect(DEFAULT_MODELS.prReviewer).toBe("github-copilot/claude-opus-4.6");
+		expect(DEFAULT_MODELS.prResponder).toBe("github-copilot/claude-sonnet-4.6");
 		expect(DEFAULT_VARIANTS.coordinator).toBeUndefined();
 		expect(DEFAULT_VARIANTS.thinker).toBe("xhigh");
 		expect(DEFAULT_VARIANTS.executor).toBeUndefined();
-		expect(DEFAULT_VARIANTS.reviewer).toBe("xhigh");
+		expect(DEFAULT_VARIANTS.reviewer).toBeUndefined();
 		expect(DEFAULT_VARIANTS.finalReviewer).toBe("xhigh");
-		expect(DEFAULT_VARIANTS.gitCommitArchitect).toBe("xhigh");
-		expect(DEFAULT_VARIANTS.prReviewer).toBe("xhigh");
+		expect(DEFAULT_VARIANTS.gitCommitArchitect).toBeUndefined();
+		expect(DEFAULT_VARIANTS.prReviewer).toBeUndefined();
+		expect(DEFAULT_VARIANTS.prResponder).toBeUndefined();
 	});
 });

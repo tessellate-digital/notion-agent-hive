@@ -169,9 +169,44 @@ BOARD_ID: {{board_id}}
 
 INSTRUCTIONS:
 Auto-detect the PR for the current branch using gh pr view.
-Fetch all review comments. Classify each comment as
-Critical, Actionable, Nitpick, or Wrong/Irrelevant.
-Return a PR_REVIEW_REPORT with metadata, classified comments,
-concise per-thread summaries, investigations, and summary counts.
+Fetch all review comments, capturing their integer IDs and comment type.
+Classify each comment as Critical, Actionable, Nitpick, or Wrong/Irrelevant.
+Return a PR_REVIEW_REPORT with metadata, classified comments (including github_id and
+comment_type per entry), concise per-thread summaries, investigations, and summary counts.
 Do not modify any files or the Notion board.
+\`\`\``;
+
+export const PR_RESPOND_TEMPLATE = `### PR Responder (PR_RESPOND)
+
+Use when the user wants to post replies to GitHub PR review comments.
+
+Phase 1 — draft (dispatch first):
+\`\`\`
+DISPATCH: PR_RESPOND
+
+BOARD_ID: {{board_id}}
+FEEDBACK_TICKET_ID: {{feedback_ticket_id}}
+PR_NUMBER: {{pr_number}}
+PHASE: DRAFT
+
+INSTRUCTIONS:
+Read the PR feedback ticket from Notion. For each comment row, extract the human's
+decision from the Human Feedback column and draft an appropriate reply.
+Short acknowledgement for addressed comments. Detailed motivation for declined ones.
+Return PR_RESPOND_PLAN with all draft replies for coordinator approval.
+Do not post anything to GitHub in this phase.
+\`\`\`
+
+Phase 2 — execute (send as follow-up after human approval, include the full approved plan):
+\`\`\`
+PHASE: EXECUTE
+
+PR_NUMBER: {{pr_number}}
+PR_URL: {{pr_url}}
+
+APPROVED_PLAN:
+{{full_pr_respond_plan}}
+
+Post all replies to GitHub using the IDs and reply text in the approved plan above.
+Do not re-fetch or re-match anything. Return PR_RESPOND_REPORT.
 \`\`\``;

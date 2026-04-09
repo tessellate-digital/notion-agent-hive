@@ -153,13 +153,14 @@ describe("install", () => {
 			"https://unpkg.com/@tesselate-digital/notion-agent-hive@latest/schema.json",
 		);
 		expect(config.agents).toEqual({
-			coordinator: { model: "openai/gpt-5.2" },
+			coordinator: { model: "github-copilot/claude-sonnet-4.6" },
 			thinker: { model: "openai/gpt-5.4", variant: "xhigh" },
-			executor: { model: "kimi-for-coding/k2p5" },
-			reviewer: { model: "openai/gpt-5.4", variant: "xhigh" },
+			executor: { model: "github-copilot/claude-sonnet-4.6" },
+			reviewer: { model: "github-copilot/claude-opus-4.6" },
 			finalReviewer: { model: "openai/gpt-5.4", variant: "xhigh" },
-			gitCommitArchitect: { model: "openai/gpt-5.4", variant: "xhigh" },
-			prReviewer: { model: "openai/gpt-5.4", variant: "xhigh" },
+			gitCommitArchitect: { model: "github-copilot/claude-opus-4.6" },
+			prReviewer: { model: "github-copilot/claude-opus-4.6" },
+			prResponder: { model: "github-copilot/claude-sonnet-4.6" },
 		});
 	});
 
@@ -180,8 +181,9 @@ describe("install", () => {
 
 		const config = readJson(join(CONFIG_DIR, "notion-agent-hive.json"));
 		expect(config.agents.finalReviewer).toEqual({ model: "openai/gpt-5.4", variant: "xhigh" });
-		expect(config.agents.gitCommitArchitect).toEqual({ model: "openai/gpt-5.4", variant: "xhigh" });
-		expect(config.agents.prReviewer).toEqual({ model: "openai/gpt-5.4", variant: "xhigh" });
+		expect(config.agents.gitCommitArchitect).toEqual({ model: "github-copilot/claude-opus-4.6" });
+		expect(config.agents.prReviewer).toEqual({ model: "github-copilot/claude-opus-4.6" });
+		expect(config.agents.prResponder).toEqual({ model: "github-copilot/claude-sonnet-4.6" });
 		// existing agents are untouched
 		expect(config.agents.coordinator).toEqual({ model: "openai/gpt-5.2" });
 	});
@@ -218,6 +220,29 @@ describe("install", () => {
 
 		const config = readJson(join(CONFIG_DIR, "notion-agent-hive.json"));
 		expect(config.agents.prReviewer.model).toBe("custom/model");
+	});
+
+	it("adds prResponder with the correct default model on fresh install", async () => {
+		await install();
+
+		const config = readJson(join(CONFIG_DIR, "notion-agent-hive.json"));
+		expect(config.agents.prResponder).toEqual({ model: "github-copilot/claude-sonnet-4.6" });
+	});
+
+	it("does not overwrite prResponder when already present in existing config", async () => {
+		writeFileSync(
+			join(CONFIG_DIR, "notion-agent-hive.json"),
+			JSON.stringify({
+				agents: {
+					prResponder: { model: "custom/model" },
+				},
+			}),
+		);
+
+		await install();
+
+		const config = readJson(join(CONFIG_DIR, "notion-agent-hive.json"));
+		expect(config.agents.prResponder.model).toBe("custom/model");
 	});
 
 	it("preserves unrecognized top-level keys when patching", async () => {
