@@ -56,8 +56,8 @@ describe("createCoordinatorAgent", () => {
 		const agent = createCoordinatorAgent();
 		expect(agent.config.agents?.["notion-thinker"]).toBe("allow");
 		expect(agent.config.agents?.["notion-executor"]).toBe("allow");
-		expect(agent.config.agents?.["notion-reviewer"]).toBe("allow");
-		expect(agent.config.agents?.["notion-pr-reviewer"]).toBe("allow");
+		expect(agent.config.agents?.["notion-reviewer-feature"]).toBe("allow");
+		expect(agent.config.agents?.["notion-reviewer-pr"]).toBe("allow");
 	});
 });
 
@@ -142,7 +142,7 @@ describe("createExecutorAgent", () => {
 describe("createReviewerAgent", () => {
 	it("creates agent with correct name", () => {
 		const agent = createReviewerAgent();
-		expect(agent.name).toBe("notion-reviewer");
+		expect(agent.name).toBe("notion-reviewer-feature");
 	});
 
 	it("denies code modification tools", () => {
@@ -160,7 +160,7 @@ describe("createReviewerAgent", () => {
 describe("createPrReviewerAgent", () => {
 	it("creates agent with correct name", () => {
 		const agent = createPrReviewerAgent();
-		expect(agent.name).toBe("notion-pr-reviewer");
+		expect(agent.name).toBe("notion-reviewer-pr");
 	});
 
 	it("denies code modification tools", () => {
