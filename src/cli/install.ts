@@ -40,6 +40,22 @@ function createDefaultAgentConfig(agent: keyof typeof DEFAULT_MODELS) {
 	};
 }
 
+export function buildNormalizedPluginEntries(
+  existingEntries: string[],
+  packageName: string,
+  pluginId: string,
+  version: string,
+): string[] {
+  const isSamePlugin = (entry: string) => {
+    const name = getPackageName(entry);
+    return name === packageName || name === pluginId;
+  };
+  return [
+    ...existingEntries.filter((entry) => !isSamePlugin(entry)),
+    `${packageName}@${version}`,
+  ];
+}
+
 export async function install(): Promise<void> {
 	const directory = getGlobalConfigDir();
 
@@ -67,20 +83,16 @@ export async function install(): Promise<void> {
     return pkg === PACKAGE_NAME || pkg === PLUGIN_ID;
   };
 
-  // Find existing entry (versioned or not) to preserve
-  const existingEntry = pluginEntries.find(isSamePlugin);
+  const alreadyRegistered = pluginEntries.some(isSamePlugin);
 
-  const normalizedPluginEntries = pluginEntries.filter((entry) => !isSamePlugin(entry));
-
-  if (existingEntry) {
-    normalizedPluginEntries.push(existingEntry);
-  } else {
-    // When installing fresh, include version from current package
-    const { version } = pkg;
-    normalizedPluginEntries.push(`${PACKAGE_NAME}@${version}`);
-  }
-
-  const alreadyRegistered = !!existingEntry;
+  // Always write the version being installed, even if the package was already registered
+  const { version } = pkg;
+  const normalizedPluginEntries = buildNormalizedPluginEntries(
+    pluginEntries,
+    PACKAGE_NAME,
+    PLUGIN_ID,
+    version,
+  );
 
   const existingPluginEntries = normalizePluginList(opencodeConfig.plugin);
   const shouldWriteOpencodeConfig =
