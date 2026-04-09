@@ -1,6 +1,6 @@
-import { TDD_WORKFLOW } from "./shared/tdd-workflow";
 import { GIT_GUARD } from "./shared/git-guard";
 import { NOTION_MCP_RULE } from "./shared/notion-mcp-rule";
+import { TDD_WORKFLOW } from "./shared/tdd-workflow";
 
 export default `# Notion Executor
 

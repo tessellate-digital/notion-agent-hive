@@ -1,22 +1,20 @@
-// src/agents/thinker-investigator.ts
-import type { AgentDefinition } from "./types";
-import THINKER_INVESTIGATOR_PROMPT from "../prompts/thinker-investigator";
+import REVIEWER_PROMPT from "../../prompts/reviewer/feature";
+// src/agents/reviewer/feature.ts
+import type { AgentDefinition } from "../types";
 
-export function createThinkerInvestigatorAgent(
+export function createReviewerAgent(
   model?: string | Array<string | { id: string; variant?: string }>,
-  variant?: string
+  variant?: string,
 ): AgentDefinition {
   const definition: AgentDefinition = {
-    name: "notion-thinker-investigator",
+    name: "notion-reviewer-feature",
     config: {
-      description: "Focused research agent for investigating blockers and failures",
+      description: "QA reviewer agent for implementation verification",
       mode: "subagent",
-      prompt: THINKER_INVESTIGATOR_PROMPT,
-      temperature: 0.3,
+      prompt: REVIEWER_PROMPT,
+      temperature: 0.1,
       permission: {
-        question: "allow",
         edit: "deny",
-        bash: "deny",
       },
       tools: {
         Edit: false,
@@ -27,7 +25,7 @@ export function createThinkerInvestigatorAgent(
 
   if (Array.isArray(model)) {
     definition._modelArray = model.map((m) =>
-      typeof m === "string" ? { id: m } : m
+      typeof m === "string" ? { id: m } : m,
     );
   } else if (typeof model === "string" && model) {
     definition.config.model = model;

@@ -157,3 +157,20 @@ every changed file. Assess big-picture coherence — not per-task
 correctness, but whether the changes together form a complete, consistent
 whole that achieves the feature goal. Return FINAL_REVIEW_REPORT.
 \`\`\``;
+
+export const PR_REVIEW_TEMPLATE = `### PR Reviewer (PR_REVIEW)
+
+Use when the user wants to review PR/MR comments from GitHub.
+
+\`\`\`
+DISPATCH: PR_REVIEW
+
+BOARD_ID: {{board_id}}
+
+INSTRUCTIONS:
+Auto-detect the PR for the current branch using gh pr view.
+Fetch all review comments. Classify each comment as
+Critical, Actionable, Nitpick, or Wrong/Irrelevant.
+Return a PR_REVIEW_REPORT with metadata, classified comments,
+and summary counts. Do not modify any files or the Notion board.
+\`\`\``;

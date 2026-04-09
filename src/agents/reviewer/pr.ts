@@ -1,17 +1,17 @@
-// src/agents/reviewer-final.ts
-import type { AgentDefinition } from "./types";
-import FINAL_REVIEWER_PROMPT from "../prompts/reviewer-final";
+import PR_REVIEWER_PROMPT from "../../prompts/reviewer/pr";
+// src/agents/reviewer/pr.ts
+import type { AgentDefinition } from "../types";
 
-export function createFinalReviewerAgent(
+export function createPrReviewerAgent(
 	model?: string | Array<string | { id: string; variant?: string }>,
 	variant?: string,
 ): AgentDefinition {
 	const definition: AgentDefinition = {
-		name: "notion-final-reviewer",
+		name: "notion-reviewer-pr",
 		config: {
-			description: "Feature-level coherence review agent: big-picture across all tasks",
+			description: "PR comment reviewer: fetches and classifies review comments from GitHub",
 			mode: "subagent",
-			prompt: FINAL_REVIEWER_PROMPT,
+			prompt: PR_REVIEWER_PROMPT,
 			temperature: 0.1,
 			permission: {
 				edit: "deny",

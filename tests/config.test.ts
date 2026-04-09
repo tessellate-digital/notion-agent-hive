@@ -114,6 +114,17 @@ describe("loadConfig", () => {
 		expect(config.agents?.finalReviewer?.variant).toBe("xhigh");
 		expect(config.agents?.gitCommitArchitect?.model).toBe("openai/gpt-5.4");
 	});
+
+	it("accepts prReviewer in config schema", () => {
+		writeJson(PROJECT_DIR, "notion-agent-hive.json", {
+			agents: {
+				prReviewer: { model: "openai/gpt-5.4", variant: "xhigh" },
+			},
+		});
+		const config = loadConfig(PROJECT_DIR);
+		expect(config.agents?.prReviewer?.model).toBe("openai/gpt-5.4");
+		expect(config.agents?.prReviewer?.variant).toBe("xhigh");
+	});
 });
 
 describe("getGlobalConfigDir", () => {
@@ -148,6 +159,7 @@ describe("DEFAULT_MODELS", () => {
 		expect(DEFAULT_MODELS.reviewer).toBeDefined();
 		expect(DEFAULT_MODELS.finalReviewer).toBeDefined();
 		expect(DEFAULT_MODELS.gitCommitArchitect).toBeDefined();
+		expect(DEFAULT_MODELS.prReviewer).toBeDefined();
 	});
 
 	it("uses the expected starter defaults", () => {
@@ -157,11 +169,13 @@ describe("DEFAULT_MODELS", () => {
 		expect(DEFAULT_MODELS.reviewer).toBe("openai/gpt-5.4");
 		expect(DEFAULT_MODELS.finalReviewer).toBe("openai/gpt-5.4");
 		expect(DEFAULT_MODELS.gitCommitArchitect).toBe("openai/gpt-5.4");
+		expect(DEFAULT_MODELS.prReviewer).toBe("openai/gpt-5.4");
 		expect(DEFAULT_VARIANTS.coordinator).toBeUndefined();
 		expect(DEFAULT_VARIANTS.thinker).toBe("xhigh");
 		expect(DEFAULT_VARIANTS.executor).toBeUndefined();
 		expect(DEFAULT_VARIANTS.reviewer).toBe("xhigh");
 		expect(DEFAULT_VARIANTS.finalReviewer).toBe("xhigh");
 		expect(DEFAULT_VARIANTS.gitCommitArchitect).toBe("xhigh");
+		expect(DEFAULT_VARIANTS.prReviewer).toBe("xhigh");
 	});
 });

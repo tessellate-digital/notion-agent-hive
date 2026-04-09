@@ -107,6 +107,7 @@ describe("install", () => {
 			reviewer: { model: "openai/gpt-5.4", variant: "xhigh" },
 			finalReviewer: { model: "openai/gpt-5.4", variant: "xhigh" },
 			gitCommitArchitect: { model: "openai/gpt-5.4", variant: "xhigh" },
+			prReviewer: { model: "openai/gpt-5.4", variant: "xhigh" },
 		});
 	});
 
@@ -128,6 +129,7 @@ describe("install", () => {
 		const config = readJson(join(CONFIG_DIR, "notion-agent-hive.json"));
 		expect(config.agents.finalReviewer).toEqual({ model: "openai/gpt-5.4", variant: "xhigh" });
 		expect(config.agents.gitCommitArchitect).toEqual({ model: "openai/gpt-5.4", variant: "xhigh" });
+		expect(config.agents.prReviewer).toEqual({ model: "openai/gpt-5.4", variant: "xhigh" });
 		// existing agents are untouched
 		expect(config.agents.coordinator).toEqual({ model: "openai/gpt-5.2" });
 	});
@@ -148,6 +150,22 @@ describe("install", () => {
 		const config = readJson(join(CONFIG_DIR, "notion-agent-hive.json"));
 		expect(config.agents.finalReviewer.model).toBe("custom/model");
 		expect(config.agents.gitCommitArchitect.model).toBe("custom/model");
+	});
+
+	it("does not overwrite prReviewer when already present in existing config", async () => {
+		writeFileSync(
+			join(CONFIG_DIR, "notion-agent-hive.json"),
+			JSON.stringify({
+				agents: {
+					prReviewer: { model: "custom/model" },
+				},
+			}),
+		);
+
+		await install();
+
+		const config = readJson(join(CONFIG_DIR, "notion-agent-hive.json"));
+		expect(config.agents.prReviewer.model).toBe("custom/model");
 	});
 
 	it("preserves unrecognized top-level keys when patching", async () => {

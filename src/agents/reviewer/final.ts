@@ -1,22 +1,21 @@
-// src/agents/thinker-planner.ts
-import type { AgentDefinition } from "./types";
-import THINKER_PLANNER_PROMPT from "../prompts/thinker-planner";
+import FINAL_REVIEWER_PROMPT from "../../prompts/reviewer/final";
+// src/agents/reviewer/final.ts
+import type { AgentDefinition } from "../types";
 
-export function createThinkerPlannerAgent(
+export function createFinalReviewerAgent(
   model?: string | Array<string | { id: string; variant?: string }>,
-  variant?: string
+  variant?: string,
 ): AgentDefinition {
   const definition: AgentDefinition = {
-    name: "notion-thinker-planner",
+    name: "notion-reviewer-final",
     config: {
-      description: "Deep research and planning agent for feature decomposition",
+      description:
+        "Feature-level coherence review agent: big-picture across all tasks",
       mode: "subagent",
-      prompt: THINKER_PLANNER_PROMPT,
-      temperature: 0.3,
+      prompt: FINAL_REVIEWER_PROMPT,
+      temperature: 0.1,
       permission: {
-        question: "allow",
         edit: "deny",
-        bash: "deny",
       },
       tools: {
         Edit: false,
@@ -27,7 +26,7 @@ export function createThinkerPlannerAgent(
 
   if (Array.isArray(model)) {
     definition._modelArray = model.map((m) =>
-      typeof m === "string" ? { id: m } : m
+      typeof m === "string" ? { id: m } : m,
     );
   } else if (typeof model === "string" && model) {
     definition.config.model = model;
