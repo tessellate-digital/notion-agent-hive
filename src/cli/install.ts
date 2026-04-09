@@ -17,8 +17,20 @@ interface OpencodeConfig {
 }
 
 function normalizePluginList(value: unknown): string[] {
-	if (!Array.isArray(value)) return [];
-	return value.filter((entry): entry is string => typeof entry === "string");
+  if (!Array.isArray(value)) return [];
+  return value.filter((entry): entry is string => typeof entry === "string");
+}
+
+function getPackageName(entry: string): string {
+  // For scoped packages like @scope/name@version, find @ after the first /
+  // For unscoped packages like package@version, find @ after position 0
+  const slashIndex = entry.indexOf("/");
+  const atIndex = entry.lastIndexOf("@");
+  // If @ comes after a / (or at position 0 for unscoped), it's a version
+  if (atIndex > 0 && (slashIndex === -1 ? atIndex > 0 : atIndex > slashIndex)) {
+    return entry.substring(0, atIndex);
+  }
+  return entry;
 }
 
 function createDefaultAgentConfig(agent: keyof typeof DEFAULT_MODELS) {
@@ -42,24 +54,39 @@ export async function install(): Promise<void> {
 		opencodeConfig = JSON.parse(readFileSync(opencodeConfigPath, "utf-8"));
 	}
 
-	const pluginEntries = [
-		...new Set([
-			...normalizePluginList(opencodeConfig.plugin),
-			...normalizePluginList(opencodeConfig.plugins),
-		]),
-	];
-	const normalizedPluginEntries = pluginEntries.filter((entry) => entry !== PLUGIN_ID);
-	const alreadyRegistered = normalizedPluginEntries.includes(PACKAGE_NAME);
+  const pluginEntries = [
+    ...new Set([
+      ...normalizePluginList(opencodeConfig.plugin),
+      ...normalizePluginList(opencodeConfig.plugins),
+    ]),
+  ];
 
-	if (!alreadyRegistered) {
-		normalizedPluginEntries.push(PACKAGE_NAME);
-	}
+  // Check if plugin is already registered (handle all variants: scoped, unscoped, versioned)
+  const isSamePlugin = (entry: string) => {
+    const pkg = getPackageName(entry);
+    return pkg === PACKAGE_NAME || pkg === PLUGIN_ID;
+  };
 
-	const shouldWriteOpencodeConfig =
-		!alreadyRegistered ||
-		"plugins" in opencodeConfig ||
-		JSON.stringify(normalizePluginList(opencodeConfig.plugin)) !==
-			JSON.stringify(normalizedPluginEntries);
+  // Find existing entry (versioned or not) to preserve
+  const existingEntry = pluginEntries.find(isSamePlugin);
+
+  const normalizedPluginEntries = pluginEntries.filter((entry) => !isSamePlugin(entry));
+
+  if (existingEntry) {
+    normalizedPluginEntries.push(existingEntry);
+  } else {
+    // When installing fresh, include version from current package
+    const { version } = pkg;
+    normalizedPluginEntries.push(`${PACKAGE_NAME}@${version}`);
+  }
+
+  const alreadyRegistered = !!existingEntry;
+
+  const existingPluginEntries = normalizePluginList(opencodeConfig.plugin);
+  const shouldWriteOpencodeConfig =
+    !alreadyRegistered ||
+    "plugins" in opencodeConfig ||
+    JSON.stringify(existingPluginEntries) !== JSON.stringify(normalizedPluginEntries);
 
 	if (shouldWriteOpencodeConfig) {
 		const { plugins: _legacyPlugins, ...nextOpencodeConfig } = opencodeConfig;

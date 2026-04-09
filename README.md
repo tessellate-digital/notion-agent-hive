@@ -41,7 +41,7 @@ Under the hood, the tool will synchronise a few specialised subagents:
 | **Executor** | Implements code for the specific ticket assigned by the coordinator. Runs a mandatory reuse scan before writing anything new — avoids duplicating existing utilities and types. Reports back with a verdict. |
 | **Reviewer — Feature** | Verifies implementations against acceptance criteria with evidence-anchored findings (every PASS/FAIL cites a file and line). Checks for code duplication. Gates tasks before human review. |
 | **Reviewer — Final** | Feature-level coherence review after all tasks pass individual review. Looks for integration gaps (A works, B works, A→B is broken), cross-task style drift, untested module seams, and cross-task duplication. |
-| **Reviewer — PR** | Fetches and classifies PR review comments from GitHub. Investigates the referenced code, verifies whether each concern is real, and classifies comments as Critical, Actionable, Nitpick, or Wrong. Creates feedback tickets for human review. |
+| **Reviewer — PR** | Fetches and classifies PR review comments from GitHub. Investigates the referenced code, verifies whether each concern is real, and classifies comments as Critical, Actionable, Nitpick, or Wrong. Returns ticket-ready summaries and analysis so the coordinator can create a human-review feedback ticket. |
 | **Git Commit Architect** | Crafts a coherent set of atomic commits when requested. Produces a plan first, waits for approval, then executes. Uses conventional commits. Never pushes. |
 
 It's quite flexible. Fire it with a rough idea, either inline or in a Notion page, and it will interactively create a plan. Give it an existing plan in Notion, and it will resume the work. Just like that, you get:

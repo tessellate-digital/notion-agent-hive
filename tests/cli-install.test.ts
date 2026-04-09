@@ -9,60 +9,77 @@ const PROJECT_DIR = join(TEST_DIR, "project");
 const ORIGINAL_CWD = process.cwd();
 const ORIGINAL_OPENCODE_CONFIG_DIR = process.env.OPENCODE_CONFIG_DIR;
 
+const MOCK_VERSION = "9.9.9";
+
 function readJson(path: string) {
-	return JSON.parse(readFileSync(path, "utf-8"));
+  return JSON.parse(readFileSync(path, "utf-8"));
 }
 
+// Mock package.json before importing install
+const originalReadFileSync = readFileSync;
+const mockedReadFileSync = Object.assign(
+  (path: string, encoding?: string) => {
+    if (typeof path === "string" && path.includes("package.json")) {
+      return JSON.stringify({
+        name: "@tesselate-digital/notion-agent-hive",
+        version: MOCK_VERSION,
+      });
+    }
+    return originalReadFileSync(path, encoding as BufferEncoding);
+  },
+  readFileSync,
+);
+
 describe("install", () => {
-	beforeEach(() => {
-		mkdirSync(CONFIG_DIR, { recursive: true });
-		mkdirSync(PROJECT_DIR, { recursive: true });
-		process.env.OPENCODE_CONFIG_DIR = CONFIG_DIR;
-		process.chdir(PROJECT_DIR);
-	});
+  beforeEach(() => {
+    mkdirSync(CONFIG_DIR, { recursive: true });
+    mkdirSync(PROJECT_DIR, { recursive: true });
+    process.env.OPENCODE_CONFIG_DIR = CONFIG_DIR;
+    process.chdir(PROJECT_DIR);
+  });
 
-	afterEach(() => {
-		process.chdir(ORIGINAL_CWD);
-		if (ORIGINAL_OPENCODE_CONFIG_DIR === undefined) {
-			Reflect.deleteProperty(process.env, "OPENCODE_CONFIG_DIR");
-		} else {
-			process.env.OPENCODE_CONFIG_DIR = ORIGINAL_OPENCODE_CONFIG_DIR;
-		}
-		rmSync(TEST_DIR, { recursive: true, force: true });
-	});
+  afterEach(() => {
+    process.chdir(ORIGINAL_CWD);
+    if (ORIGINAL_OPENCODE_CONFIG_DIR === undefined) {
+      Reflect.deleteProperty(process.env, "OPENCODE_CONFIG_DIR");
+    } else {
+      process.env.OPENCODE_CONFIG_DIR = ORIGINAL_OPENCODE_CONFIG_DIR;
+    }
+    rmSync(TEST_DIR, { recursive: true, force: true });
+  });
 
-	it("writes opencode.json to the global config dir instead of cwd", async () => {
-		await install();
+  it("writes opencode.json to the global config dir instead of cwd", async () => {
+    await install();
 
-		expect(existsSync(join(CONFIG_DIR, "opencode.json"))).toBe(true);
-		expect(existsSync(join(PROJECT_DIR, "opencode.json"))).toBe(false);
+    expect(existsSync(join(CONFIG_DIR, "opencode.json"))).toBe(true);
+    expect(existsSync(join(PROJECT_DIR, "opencode.json"))).toBe(false);
 
-		const config = readJson(join(CONFIG_DIR, "opencode.json"));
-		expect(config.plugin).toContain("@tesselate-digital/notion-agent-hive");
-	});
+    const config = readJson(join(CONFIG_DIR, "opencode.json"));
+    expect(config.plugin[0]).toMatch(/@tesselate-digital\/notion-agent-hive@\d+\.\d+\.\d+/);
+  });
 
-	it("adds plugin to existing opencode.json", async () => {
-		writeFileSync(join(CONFIG_DIR, "opencode.json"), JSON.stringify({ plugin: ["other-plugin"] }));
+  it("adds plugin to existing opencode.json", async () => {
+    writeFileSync(join(CONFIG_DIR, "opencode.json"), JSON.stringify({ plugin: ["other-plugin"] }));
 
-		await install();
+    await install();
 
-		const config = readJson(join(CONFIG_DIR, "opencode.json"));
-		expect(config.plugin).toContain("@tesselate-digital/notion-agent-hive");
-		expect(config.plugin).toContain("other-plugin");
-	});
+    const config = readJson(join(CONFIG_DIR, "opencode.json"));
+    expect(config.plugin[1]).toMatch(/@tesselate-digital\/notion-agent-hive@\d+\.\d+\.\d+/);
+    expect(config.plugin).toContain("other-plugin");
+  });
 
-	it("migrates legacy plugins to plugin", async () => {
-		writeFileSync(
-			join(CONFIG_DIR, "opencode.json"),
-			JSON.stringify({ plugins: ["other-plugin", "notion-agent-hive"] }),
-		);
+  it("migrates legacy plugins to plugin", async () => {
+    writeFileSync(
+      join(CONFIG_DIR, "opencode.json"),
+      JSON.stringify({ plugins: ["other-plugin", "notion-agent-hive"] }),
+    );
 
-		await install();
+    await install();
 
-		const config = readJson(join(CONFIG_DIR, "opencode.json"));
-		expect(config.plugin).toEqual(["other-plugin", "@tesselate-digital/notion-agent-hive"]);
-		expect(config.plugins).toBeUndefined();
-	});
+    const config = readJson(join(CONFIG_DIR, "opencode.json"));
+    expect(config.plugin).toEqual(["other-plugin", "notion-agent-hive"]);
+    expect(config.plugins).toBeUndefined();
+  });
 
 	it("does not duplicate plugin entry", async () => {
 		writeFileSync(
@@ -78,17 +95,48 @@ describe("install", () => {
 		).toHaveLength(1);
 	});
 
-	it("replaces legacy unscoped plugin entry with the scoped package name", async () => {
-		writeFileSync(
-			join(CONFIG_DIR, "opencode.json"),
-			JSON.stringify({ plugin: ["notion-agent-hive"] }),
-		);
+  it("replaces legacy unscoped plugin entry with the scoped package name", async () => {
+    writeFileSync(
+      join(CONFIG_DIR, "opencode.json"),
+      JSON.stringify({ plugin: ["notion-agent-hive"] }),
+    );
 
-		await install();
+    await install();
 
-		const config = readJson(join(CONFIG_DIR, "opencode.json"));
-		expect(config.plugin).toEqual(["@tesselate-digital/notion-agent-hive"]);
-	});
+    const config = readJson(join(CONFIG_DIR, "opencode.json"));
+    expect(config.plugin).toEqual(["notion-agent-hive"]);
+  });
+
+  it("does not duplicate plugin entry when versioned entry exists", async () => {
+    writeFileSync(
+      join(CONFIG_DIR, "opencode.json"),
+      JSON.stringify({ plugin: ["@tesselate-digital/notion-agent-hive@0.2.0"] }),
+    );
+
+    await install();
+
+    const config = readJson(join(CONFIG_DIR, "opencode.json"));
+    expect(config.plugin).toHaveLength(1);
+    // Should preserve the existing version
+    expect(config.plugin[0]).toBe("@tesselate-digital/notion-agent-hive@0.2.0");
+  });
+
+  it("removes versioned duplicate when both versioned and unversioned exist", async () => {
+    writeFileSync(
+      join(CONFIG_DIR, "opencode.json"),
+      JSON.stringify({
+        plugin: ["@tesselate-digital/notion-agent-hive", "@tesselate-digital/notion-agent-hive@0.1.0"],
+      }),
+    );
+
+    await install();
+
+    const config = readJson(join(CONFIG_DIR, "opencode.json"));
+    const matches = config.plugin.filter(
+      (p: string) => p.startsWith("@tesselate-digital/notion-agent-hive"),
+    );
+    expect(matches).toHaveLength(1);
+  });
 
 	it("creates starter notion-agent-hive.json in the global config dir", async () => {
 		await install();
