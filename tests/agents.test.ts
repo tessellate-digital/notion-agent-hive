@@ -3,7 +3,8 @@ import { describe, expect, it } from "bun:test";
 import { version } from "../package.json";
 import { createCoordinatorAgent } from "../src/agents/coordinator";
 import { createExecutorAgent } from "../src/agents/executor";
-import { createPrReviewerAgent } from "../src/agents/reviewer/pr";
+import { createPrReviewerAgent } from "../src/agents/pr/reviewer";
+import { createPrResponderAgent } from "../src/agents/pr/responder";
 import { createReviewerAgent } from "../src/agents/reviewer/feature";
 import { createThinkerInvestigatorAgent } from "../src/agents/thinker/investigator";
 import { createThinkerPlannerAgent } from "../src/agents/thinker/planner";
@@ -61,7 +62,8 @@ describe("createCoordinatorAgent", () => {
 		expect(agent.config.agents?.["notion-reviewer-feature"]).toBe("allow");
 		expect(agent.config.agents?.["notion-reviewer-final"]).toBe("allow");
 		expect(agent.config.agents?.["notion-git-commit-architect"]).toBe("allow");
-		expect(agent.config.agents?.["notion-reviewer-pr"]).toBe("allow");
+		expect(agent.config.agents?.["notion-pr-reviewer"]).toBe("allow");
+		expect(agent.config.agents?.["notion-pr-responder"]).toBe("allow");
 		expect(agent.config.agents?.["notion-thinker"]).toBeUndefined();
 	});
 });
@@ -165,7 +167,7 @@ describe("createReviewerAgent", () => {
 describe("createPrReviewerAgent", () => {
 	it("creates agent with correct name", () => {
 		const agent = createPrReviewerAgent();
-		expect(agent.name).toBe("notion-reviewer-pr");
+		expect(agent.name).toBe("notion-pr-reviewer");
 	});
 
 	it("denies code modification tools", () => {
@@ -187,6 +189,35 @@ describe("createPrReviewerAgent", () => {
 
 	it("applies model array correctly", () => {
 		const agent = createPrReviewerAgent(["openai/gpt-4o", "anthropic/claude-3-opus"]);
+		expect(agent._modelArray).toHaveLength(2);
+	});
+});
+
+describe("createPrResponderAgent", () => {
+	it("creates agent with correct name", () => {
+		const agent = createPrResponderAgent();
+		expect(agent.name).toBe("notion-pr-responder");
+	});
+
+	it("denies code modification tools", () => {
+		const agent = createPrResponderAgent();
+		expect(agent.config.tools?.Edit).toBe(false);
+		expect(agent.config.tools?.Write).toBe(false);
+	});
+
+	it("is a subagent, not primary", () => {
+		const agent = createPrResponderAgent();
+		expect(agent.config.mode).toBe("subagent");
+	});
+
+	it("applies string model correctly", () => {
+		const agent = createPrResponderAgent("openai/gpt-4o", "max");
+		expect(agent.config.model).toBe("openai/gpt-4o");
+		expect(agent.config.variant).toBe("max");
+	});
+
+	it("applies model array correctly", () => {
+		const agent = createPrResponderAgent(["openai/gpt-4o", "anthropic/claude-3-opus"]);
 		expect(agent._modelArray).toHaveLength(2);
 	});
 });

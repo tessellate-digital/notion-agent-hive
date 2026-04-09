@@ -1,18 +1,17 @@
-import PR_REVIEWER_PROMPT from "../../prompts/reviewer/pr";
-// src/agents/reviewer/pr.ts
+import PR_RESPONDER_PROMPT from "../../prompts/pr/responder";
 import type { AgentDefinition } from "../types";
 
-export function createPrReviewerAgent(
+export function createPrResponderAgent(
 	model?: string | Array<string | { id: string; variant?: string }>,
 	variant?: string,
 ): AgentDefinition {
 	const definition: AgentDefinition = {
-		name: "notion-reviewer-pr",
+		name: "notion-pr-responder",
 		config: {
-			description: "PR comment reviewer: fetches and classifies review comments from GitHub",
+			description: "PR responder: drafts and posts replies to GitHub PR review comments",
 			mode: "subagent",
-			prompt: PR_REVIEWER_PROMPT,
-			temperature: 0.1,
+			prompt: PR_RESPONDER_PROMPT,
+			temperature: 0.3,
 			permission: {
 				edit: "deny",
 			},

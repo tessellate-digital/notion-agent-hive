@@ -39,7 +39,7 @@ describe("plugin entry", () => {
 		await hooks.config?.(input);
 
 		expect(input.agent?.[`notion agent hive v${version}`]).toMatchObject({
-			model: "openai/gpt-5.2",
+			model: "github-copilot/claude-sonnet-4.6",
 		});
 		expect(input.agent?.["notion-thinker-planner"]).toMatchObject({
 			model: "openai/gpt-5.4",
@@ -53,14 +53,17 @@ describe("plugin entry", () => {
 			model: "openai/gpt-5.4",
 			variant: "xhigh",
 		});
-		expect(input.agent?.["notion-executor"]).toMatchObject({ model: "kimi-for-coding/k2p5" });
-		expect(input.agent?.["notion-reviewer-feature"]).toMatchObject({
-			model: "openai/gpt-5.4",
-			variant: "xhigh",
+		expect(input.agent?.["notion-executor"]).toMatchObject({
+			model: "github-copilot/claude-sonnet-4.6",
 		});
-		expect(input.agent?.["notion-reviewer-pr"]).toMatchObject({
-			model: "openai/gpt-5.4",
-			variant: "xhigh",
+		expect(input.agent?.["notion-reviewer-feature"]).toMatchObject({
+			model: "github-copilot/claude-opus-4.6",
+		});
+		expect(input.agent?.["notion-pr-reviewer"]).toMatchObject({
+			model: "github-copilot/claude-opus-4.6",
+		});
+		expect(input.agent?.["notion-pr-responder"]).toMatchObject({
+			model: "github-copilot/claude-sonnet-4.6",
 		});
 	});
 });
