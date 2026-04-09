@@ -39,6 +39,7 @@ Common mistakes to avoid:
 | Skipping the "confirm fail" step | Test might not be testing anything useful | Always run test and verify it fails for the right reason |
 | Writing more code than needed | YAGNI; violates minimal implementation principle | Write only enough code to make the current test pass |
 | Reimplementing existing utilities | Creates duplicate code, maintenance burden, and subtle divergence over time | Before writing any new function or type, scan the codebase for existing implementations |
+| Running git stash | Silently destroys the user's staged changes | Never stash; run tests against the current working tree as-is |
 
 ---
 
@@ -90,6 +91,25 @@ These are non-negotiable constraints. Violation is never acceptable.
 |  - Time pressure                                                 |
 |                                                                  |
 |  Sequence: Write test -> Run test -> Confirm FAIL -> Then code   |
++------------------------------------------------------------------+
+\`\`\`
+
+### HARD-GATE: Never Run git stash
+
+\`\`\`
++------------------------------------------------------------------+
+|  HARD GATE: NO GIT STASH                                         |
+|------------------------------------------------------------------|
+|  You MUST NEVER run git stash (push, pop, drop, or any variant). |
+|                                                                  |
+|  The user may have intentionally staged changes in the working   |
+|  tree. Stashing silently destroys that state and cannot be       |
+|  safely recovered without manual intervention.                   |
+|                                                                  |
+|  If you think you need a clean working tree to run tests:        |
+|  -> You do not. Run tests against the current working tree.      |
+|                                                                  |
+|  NO EXCEPTIONS.                                                  |
 +------------------------------------------------------------------+
 \`\`\`
 

@@ -175,6 +175,7 @@ digraph execute_phase {
     eval_exec [shape=diamond, label="Executor\\nverdict?"];
 
     move_test [label="Move to In Test"];
+    move_review [label="Move to In Review"];
     dispatch_review [label="Dispatch notion-reviewer-feature\\n[MANDATORY]"];
     eval_review [shape=diamond, label="Reviewer\\nverdict?"];
 
@@ -196,7 +197,8 @@ digraph execute_phase {
     eval_exec -> dispatch_investigate [label="BLOCKED"];
     eval_exec -> move_blocked [label="NEEDS_DETAILS"];
 
-    move_test -> dispatch_review;
+    move_test -> move_review;
+    move_review -> dispatch_review;
     dispatch_review -> eval_review;
 
     eval_review -> move_human [label="PASS"];
@@ -299,6 +301,47 @@ These are non-negotiable constraints. Violation is never acceptable.
 |  Only the human user can move: Human Review -> Done              |
 |                                                                  |
 |  This ensures human sign-off on all completed work.              |
++------------------------------------------------------------------+
+\`\`\`
+
+### HARD-GATE: Move to In Review Before Dispatching Reviewer
+
+\`\`\`
++------------------------------------------------------------------+
+|  HARD GATE: IN-REVIEW BEFORE REVIEWER DISPATCH                   |
+|------------------------------------------------------------------|
+|  The coordinator MUST update the task status to In Review        |
+|  BEFORE dispatching the notion-reviewer-feature. The board       |
+|  update ALWAYS happens first.                                    |
+|                                                                  |
+|  Mandatory sequence:                                             |
+|  1. notion-update-page: Status -> In Review                      |
+|  2. Dispatch notion-reviewer-feature                             |
+|                                                                  |
+|  Dispatching the reviewer while the task is still In Test is a   |
+|  violation. The board must reflect reality at all times.         |
++------------------------------------------------------------------+
+\`\`\`
+
+### HARD-GATE: Move to In Progress Before Dispatching Executor
+
+\`\`\`
++------------------------------------------------------------------+
+|  HARD GATE: IN-PROGRESS BEFORE DISPATCH                          |
+|------------------------------------------------------------------|
+|  The coordinator MUST update the task status to In Progress      |
+|  BEFORE dispatching the notion-executor. These steps are NOT     |
+|  atomic — the board update ALWAYS happens first.                 |
+|                                                                  |
+|  Mandatory sequence:                                             |
+|  1. notion-update-page: Status -> In Progress                    |
+|  2. Dispatch notion-executor                                     |
+|                                                                  |
+|  Dispatching the executor while the task is still To Do is a     |
+|  violation. The board must reflect reality at all times.         |
+|                                                                  |
+|  This applies to parallel execution too: move EACH task to       |
+|  In Progress before dispatching its executor.                    |
 +------------------------------------------------------------------+
 \`\`\`
 
@@ -440,10 +483,11 @@ Check for tasks moved back to To Do by human (rework cycle). These take priority
 
 **HARD GATE**: Every task must pass reviewer before Human Review.
 
-1. **Dispatch \`notion-reviewer-feature\`** with task context
-2. **Evaluate verdict:**
-   - \`PASS\`: Move In Test -> Human Review
-   - \`FAIL\`: Move In Test -> To Do, re-dispatch executor with findings
+1. **Move task** In Test -> In Review
+2. **Dispatch \`notion-reviewer-feature\`** with task context
+3. **Evaluate verdict:**
+   - \`PASS\`: Move In Review -> Human Review
+   - \`FAIL\`: Move In Review -> To Do, re-dispatch executor with findings
    - \`NEEDS_DETAILS\`: Move to Needs Human Input
 
 3. **No agent moves to Done.** Only human can move Human Review -> Done.
