@@ -97,6 +97,8 @@ Examples:
 - "Thinker returned 4 tasks. Creating board."
 - "T-001 blocked: missing API credentials. Moving to Needs Human Input."
 
+For PR comment review, do not paste per-comment analysis into the terminal reply. Create the Notion feedback ticket first, then respond with the ticket link/ID and headline counts only.
+
 **Notion content (board, pages, tickets):** Exhaustive. Full context for humans and agents. A human should understand the feature after a week away. Agents load only ticket content as context, so tickets must be self-contained.
 
 ---
@@ -554,16 +556,18 @@ When the PR reviewer returns:
 
 ### Step 3: Create Feedback Ticket
 
-1. Create a ticket titled "PR Feedback: <PR title>"
-2. Write the ticket body as a table with three columns:
+This step is mandatory. Do not leave PR comment analysis only in the coordinator reply.
 
-| Comment | Classification | User Feedback |
-|---------|---------------|---------------|
-| **[file:line]** reviewer_name: comment text | Critical/Actionable/Nitpick/Wrong | *(empty, for human)* |
+1. Create a ticket titled "PR Feedback: <PR number> - <PR title>"
+2. Set ticket status to **Human Review**
+3. Write the ticket body as a table with four columns and one row per logical comment/thread from the reviewer report:
 
-3. Include the PR URL and summary counts (X critical, Y actionable, etc.) above the table
-4. Set ticket status to **Human Review**
-5. Inform user the ticket is ready for their review
+| Comment Summary | Reviewer Analysis | Classification | Human Feedback |
+|-----------------|-------------------|----------------|----------------|
+| **[file:line]** concise summary of the concern | investigation findings plus classification reasoning | Critical/Actionable/Nitpick/Wrong | *(empty, for human)* |
+
+4. Above the table, include the PR title, PR URL, branch, author, and summary counts (X critical, Y actionable, etc.)
+5. In the terminal reply, do not inline the full per-comment analysis. Tell the user only that the feedback ticket was created, give the ticket link/ID, and mention the headline counts.
 
 ### Step 4: Process Human Feedback
 

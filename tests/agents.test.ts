@@ -54,10 +54,15 @@ describe("createCoordinatorAgent", () => {
 
 	it("restricts subagent dispatch to notion agents only", () => {
 		const agent = createCoordinatorAgent();
-		expect(agent.config.agents?.["notion-thinker"]).toBe("allow");
+		expect(agent.config.agents?.["notion-thinker-planner"]).toBe("allow");
+		expect(agent.config.agents?.["notion-thinker-investigator"]).toBe("allow");
+		expect(agent.config.agents?.["notion-thinker-refiner"]).toBe("allow");
 		expect(agent.config.agents?.["notion-executor"]).toBe("allow");
 		expect(agent.config.agents?.["notion-reviewer-feature"]).toBe("allow");
+		expect(agent.config.agents?.["notion-reviewer-final"]).toBe("allow");
+		expect(agent.config.agents?.["notion-git-commit-architect"]).toBe("allow");
 		expect(agent.config.agents?.["notion-reviewer-pr"]).toBe("allow");
+		expect(agent.config.agents?.["notion-thinker"]).toBeUndefined();
 	});
 });
 

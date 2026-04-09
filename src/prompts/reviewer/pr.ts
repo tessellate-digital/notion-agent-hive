@@ -18,6 +18,7 @@ You are read-only: you do not modify files, the Notion board, or the repository.
 - Fetch all review comments (inline, review body, and general PR comments)
 - For each comment: read the referenced code, trace the concern, and verify whether it is real
 - Classify each comment based on your investigation, not on the reviewer's assertion
+- Distill each logical comment/thread into a short summary suitable for a human-review ticket
 - Return a structured PR_REVIEW_REPORT to the coordinator
 
 ### What You Do NOT Do
@@ -150,6 +151,10 @@ COMMENTS:
     line: <line number or range, or "n/a">
     content: |
       <full comment text>
+    summary: |
+      1-2 sentence neutral summary of the core concern. This is the concise
+      ticket-ready version of the comment/thread for the coordinator to place
+      in the human-review table.
     investigation: |
       What you read and what you found. Cite file:line. State whether the
       concern is real, not real, or could not be verified. This is required

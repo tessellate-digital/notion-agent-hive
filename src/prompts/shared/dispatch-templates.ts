@@ -172,5 +172,6 @@ Auto-detect the PR for the current branch using gh pr view.
 Fetch all review comments. Classify each comment as
 Critical, Actionable, Nitpick, or Wrong/Irrelevant.
 Return a PR_REVIEW_REPORT with metadata, classified comments,
-and summary counts. Do not modify any files or the Notion board.
+concise per-thread summaries, investigations, and summary counts.
+Do not modify any files or the Notion board.
 \`\`\``;
