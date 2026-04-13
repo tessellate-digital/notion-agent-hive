@@ -192,6 +192,9 @@ PHASE: DRAFT
 INSTRUCTIONS:
 Read the PR feedback ticket from Notion. For each comment row, extract the human's
 decision from the Human Feedback column and draft an appropriate reply.
+Use the machine-readable metadata stored in each Comment Summary row as the source
+of truth for github_id, comment_type, and author. Do not fetch GitHub comments or
+re-match anything in this phase.
 Short acknowledgement for addressed comments. Detailed motivation for declined ones.
 Return PR_RESPOND_PLAN with all draft replies for coordinator approval.
 Do not post anything to GitHub in this phase.
@@ -208,5 +211,8 @@ APPROVED_PLAN:
 {{full_pr_respond_plan}}
 
 Post all replies to GitHub using the IDs and reply text in the approved plan above.
+Parse the repo owner and name from PR_URL — do not use gh repo view.
+For inline review replies, use /repos/{owner}/{repo}/pulls/{pull_number}/comments/{github_id}/replies.
+If one inline reply fails, mark it failed. Do not collapse replies into a single PR comment.
 Do not re-fetch or re-match anything. Return PR_RESPOND_REPORT.
 \`\`\``;
