@@ -78,7 +78,7 @@ digraph pr_respond {
     draft_reply [label="Draft reply per row\\nusing Reply Guidelines"];
     draft_return [label="Return PR_RESPOND_PLAN"];
 
-    exec_repo [label="Get repo: gh repo view --json owner,name"];
+    exec_repo [label="Parse owner/repo/PR number\nfrom PR_URL"];
     exec_loop [label="For each approved reply:\\npost to GitHub via gh api"];
     exec_return [label="Return PR_RESPOND_REPORT"];
 
@@ -115,14 +115,15 @@ From Human Feedback: determine the decision — done, declined, or empty.
 
 ### Step 3: Resolve GitHub comment IDs
 
-Before drafting replies, fetch all PR comments from GitHub to resolve their integer IDs.
-Use whatever tooling is available (GitHub CLI, REST API). Capture two sets:
+Use the machine-readable metadata stored in the Notion ticket as the source of truth whenever it includes \`github_id\`, \`comment_type\`, and author.
+
+Only if that metadata is missing should you fetch PR comments from GitHub to resolve IDs. In that fallback case, use whatever tooling is available (GitHub CLI, REST API) and capture two sets:
 - **Inline review comments** (on specific files/lines) — \`comment_type: review_comment\`
 - **General conversation comments** — \`comment_type: issue_comment\`
 
-For each comment in the Notion table, match it to a live GitHub comment using author + file + line (for inline) or author + content (for general). Record the integer \`github_id\` and \`comment_type\` for each match.
+For each unmatched comment in the Notion table, match it to a live GitHub comment using author + file + line (for inline) or author + content (for general). Record the integer \`github_id\` and \`comment_type\` for each match.
 
-If a comment cannot be matched, set \`github_id: 0\` and note it — the coordinator will flag it.
+If a comment still cannot be matched, set \`github_id: 0\` and note it — the coordinator will flag it.
 
 ### Step 4: Draft replies
 
@@ -158,9 +159,9 @@ You receive the approved PR_RESPOND_PLAN from the coordinator. It already contai
 
 ### Step 1: Detect repository
 
-\`\`\`
-gh repo view --json owner,name
-\`\`\`
+Parse \`owner\`, \`repo\`, and \`pull_number\` directly from \`PR_URL\`.
+
+Do not use \`gh repo view\` for this step. The current checkout may be a different repository than the PR being discussed.
 
 ### Step 2: Post each reply
 
@@ -170,12 +171,23 @@ Iterate through the approved replies in order.
 
 **For \`comment_type: review_comment\`** (inline on file/line):
 
-Reply directly to the comment using its integer ID.
+Reply directly to the comment using its integer ID and the PR-number-scoped endpoint:
+
+\`\`\`
+gh api \\
+  --method POST \\
+  /repos/{owner}/{repo}/pulls/{pull_number}/comments/{github_id}/replies \\
+  -f body='<reply text>'
+\`\`\`
+
+Never use \`/repos/{owner}/{repo}/pulls/comments/{github_id}/replies\`.
 
 **For \`comment_type: issue_comment\`** (general conversation):
 
 GitHub has no native threading for general comments. Post a new comment prefixed with the original author mention:
 \`@{author} <reply text>\`
+
+Post one GitHub reply per approved plan entry. Do not batch multiple replies into a single summary comment.
 
 ### Step 3: Return PR_RESPOND_REPORT
 
@@ -206,7 +218,7 @@ RESULTS:
 |----------|--------|
 | github_id is 0 (unresolved during DRAFT) | Skip in EXECUTE, mark as skipped in report |
 | Cannot match a comment during DRAFT | Set github_id to 0, note in plan — coordinator flags for manual handling |
-| GitHub API returns 404 during EXECUTE | Mark as failed, include error, continue with remaining replies |
+| GitHub API returns 404 during EXECUTE | Mark that reply as failed, include the exact endpoint used, continue with remaining replies, and do not fall back to issue comments for a \`review_comment\` |
 | GitHub API returns 403 during EXECUTE | Abort EXECUTE, return FAILED with permission error |
 | Reply text empty after drafting | Use the no_feedback default reply |
 | Human feedback column missing | Treat all comments as no_feedback |
