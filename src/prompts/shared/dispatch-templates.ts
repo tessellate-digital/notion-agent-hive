@@ -157,6 +157,10 @@ INSTRUCTIONS:
 Analyze all staged and unstaged changes. Group them into atomic,
 coherent commits. Return a GIT_COMMIT_PLAN before executing anything.
 Wait for coordinator approval before running any git write commands.
+If relevant work is already committed (including pushed commits), propose
+rewrite/reorder strategy and include collaborator-risk warning.
+Push only if the coordinator explicitly says the user requested it. If
+rewriting pushed history, use --force-with-lease.
 \`\`\``;
 
 export const STACKED_PR_TEMPLATE = `### Stacked PR Architect (GIT_STACK)
@@ -174,7 +178,10 @@ INSTRUCTIONS:
 Analyze all staged and unstaged changes. Group them into ordered,
 reviewable stack layers. Return a GIT_STACK_PLAN before executing anything.
 Wait for coordinator approval before running any git or gh-stack write commands.
-Do not push branches or submit PRs.
+If relevant work is already committed (including pushed commits), propose
+stack rewrite/reorder strategy and include collaborator-risk warning.
+Push/publish only if the coordinator explicitly says the user requested it.
+Any rewritten pushed branch must use --force-with-lease, never plain --force.
 \`\`\``;
 
 export const FINAL_REVIEW_TEMPLATE = `### Final Reviewer (FINAL_REVIEW)

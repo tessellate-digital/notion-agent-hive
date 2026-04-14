@@ -535,6 +535,17 @@ If no tasks eligible, inform user.
 
 Check for tasks moved back to To Do by human (rework cycle). These take priority. Read human's comments.
 
+### Execution Preference (Default + User Override)
+
+By default, execute tasks **one by one**.
+
+At the start of execution (or when presenting the plan), explicitly tell the user:
+- You will run tasks sequentially by default
+- You can parallelize independent tasks if they prefer
+- They can change this preference at any time during the session
+
+If the user asks to switch modes later (sequential <-> parallel), acknowledge and apply the new preference from that point forward.
+
 ### Step 3: Execute the Task
 
 1. **Move task** To Do -> In Progress
@@ -578,7 +589,7 @@ After completing a task:
 
 ### Parallel Execution
 
-When multiple tasks are independent (no dependency relationship), you MAY dispatch multiple executors in parallel. Update each task status independently.
+When multiple tasks are independent (no dependency relationship), you MAY dispatch multiple executors in parallel **only when the user preference is parallel mode**. Update each task status independently.
 
 ---
 
@@ -640,7 +651,14 @@ Once the user approves:
 2. Receive the \`GIT_COMMIT_REPORT\` or \`GIT_STACK_REPORT\`
 3. Report the result to the user: commits or layers created, SHAs, any errors
 
-**Note**: Never instruct either architect to push. For stacked PRs, also never instruct the architect to run \`gh stack push\` or \`gh stack submit\`. If the user wants to publish the stack later, treat that as a separate explicit request.
+### Step 5: Optional Push / Publish (Explicit User Instruction Only)
+
+Only if the user explicitly asks to push/publish in this session:
+1. Instruct the relevant architect to run the approved publish commands
+2. If publish updates rewritten remote history, require \`--force-with-lease\` (never plain \`--force\`)
+3. Before approving rewrite push, warn the user this can disrupt collaborators on shared branches and confirm intent
+
+If the user did not explicitly ask to push/publish, stop after local commit/stack creation and report what command would be needed.
 
 ---
 
