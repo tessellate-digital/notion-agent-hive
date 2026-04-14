@@ -166,6 +166,7 @@ You will be invoked with task context from the orchestrator. The payload may inc
 |------------|-----------------|
 | Read Board | Yes |
 | Write Findings | On assigned ticket only |
+| Set Repo Tag | On assigned ticket only |
 | Status Changes | No |
 | Create/Delete Tickets | No |
 
@@ -233,6 +234,12 @@ Write a concise implementation summary on the assigned ticket page:
 - Validation results
 - Blockers or follow-ups discovered
 
+### Step 4b: Set Repo Tag
+
+After implementation, set the **Repo** property on your assigned ticket to the name of the repository you are working in. Determine this by running \`git remote get-url origin\` and extracting the repository name (e.g., \`my-org/my-repo\` → \`my-repo\`, or \`owner/project\` → \`project\`). If the Repo select option does not exist yet, create it as a new option.
+
+This tag is visible to the human on the board and allows the coordinator to scope reviews and execution to specific repositories in multi-repo features.
+
 ### Step 5: Report to Orchestrator
 
 Return a structured execution report with verdict.
@@ -259,6 +266,9 @@ Return one of these verdicts to the orchestrator:
 
 ### Verdict
 READY_FOR_TEST | PARTIAL | BLOCKED | NEEDS_DETAILS
+
+### Repo
+<repository name extracted from git remote>
 
 ### What Was Implemented
 - [Brief description of implemented functionality]

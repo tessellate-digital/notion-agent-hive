@@ -1,6 +1,5 @@
-import GIT_COMMIT_ARCHITECT_PROMPT from "../prompts/git-commit-architect";
-// src/agents/git-commit-architect.ts
-import type { AgentDefinition } from "./types";
+import GIT_COMMIT_ARCHITECT_PROMPT from "../../prompts/git/commit-architect";
+import type { AgentDefinition } from "../types";
 
 export function createGitCommitArchitectAgent(
   model?: string | Array<string | { id: string; variant?: string }>,

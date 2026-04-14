@@ -116,7 +116,13 @@ export async function install(): Promise<void> {
 
 	// Create starter config or patch existing one with any missing agents
 	const pluginConfigPath = join(directory, "notion-agent-hive.json");
-	const NEW_AGENTS = ["finalReviewer", "gitCommitArchitect", "prReviewer", "prResponder"] as const;
+	const NEW_AGENTS = [
+		"finalReviewer",
+		"gitCommitArchitect",
+		"stackedPrArchitect",
+		"prReviewer",
+		"prResponder",
+	] as const;
 
 	if (existsSync(pluginConfigPath)) {
 		const existingConfig = JSON.parse(readFileSync(pluginConfigPath, "utf-8"));
@@ -143,6 +149,7 @@ export async function install(): Promise<void> {
 				reviewer: createDefaultAgentConfig("reviewer"),
 				finalReviewer: createDefaultAgentConfig("finalReviewer"),
 				gitCommitArchitect: createDefaultAgentConfig("gitCommitArchitect"),
+				stackedPrArchitect: createDefaultAgentConfig("stackedPrArchitect"),
 				prReviewer: createDefaultAgentConfig("prReviewer"),
 				prResponder: createDefaultAgentConfig("prResponder"),
 			},

@@ -138,8 +138,9 @@ You will be invoked with feature-level context from the coordinator:
 
 For each task ID provided:
 1. Fetch the task page from Notion via MCP
-2. Note its acceptance criteria, files it changed, and its per-task verdict
-3. Build a map: **concern → files touched → ticket**
+2. **Skip tasks with Status = Released** — their changes are already shipped and outside your review scope. Note them as "Released — excluded from review" in your report.
+3. Note each remaining task's acceptance criteria, files it changed, and its per-task verdict
+4. Build a map: **concern → files touched → ticket**
 
 ### Step 3: Read All Changed Files
 
@@ -295,6 +296,7 @@ Based on your verdict:
 - **No task spawning.** You cannot invoke other subagents.
 - **No ticket creation.** Only coordinator/thinker may create tickets. You may write to the feature page.
 - **Feature scope only.** Do not re-audit individual task quality — focus on the whole, style consistency, and integration seams.
+- **Skip Released tasks.** Tasks with Status = Released are already shipped. Exclude them from your review scope — their code is not part of the current review. Note them as excluded in your report.
 - **Evidence-based.** Every finding must cite specific file paths and line numbers.
 - **Independent synthesis.** Do not simply summarize the individual REVIEW_REPORTs — look for what they collectively missed.
 - **Integration gaps are your primary concern.** A feature where each task passed individually but the flows between tasks are untested or broken is a failed feature.

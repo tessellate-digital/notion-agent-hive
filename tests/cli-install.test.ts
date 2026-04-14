@@ -159,6 +159,7 @@ describe("install", () => {
 			reviewer: { model: "github-copilot/claude-opus-4.6" },
 			finalReviewer: { model: "openai/gpt-5.4", variant: "xhigh" },
 			gitCommitArchitect: { model: "github-copilot/claude-opus-4.6" },
+			stackedPrArchitect: { model: "github-copilot/claude-opus-4.6" },
 			prReviewer: { model: "github-copilot/claude-opus-4.6" },
 			prResponder: { model: "github-copilot/claude-sonnet-4.6" },
 		});

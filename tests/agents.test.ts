@@ -3,12 +3,16 @@ import { describe, expect, it } from "bun:test";
 import { version } from "../package.json";
 import { createCoordinatorAgent } from "../src/agents/coordinator";
 import { createExecutorAgent } from "../src/agents/executor";
+import { createGitCommitArchitectAgent } from "../src/agents/git/commit-architect";
+import { createStackedPrArchitectAgent } from "../src/agents/git/stacked-pr-architect";
 import { createPrReviewerAgent } from "../src/agents/pr/reviewer";
 import { createPrResponderAgent } from "../src/agents/pr/responder";
 import { createReviewerAgent } from "../src/agents/reviewer/feature";
+import { createFinalReviewerAgent } from "../src/agents/reviewer/final";
 import { createThinkerInvestigatorAgent } from "../src/agents/thinker/investigator";
 import { createThinkerPlannerAgent } from "../src/agents/thinker/planner";
 import { createThinkerRefinerAgent } from "../src/agents/thinker/refiner";
+import { createThinkerScoperAgent } from "../src/agents/thinker/scoper";
 import type { AgentDefinition } from "../src/agents/types";
 
 describe("AgentDefinition", () => {
@@ -55,6 +59,7 @@ describe("createCoordinatorAgent", () => {
 
 	it("restricts subagent dispatch to notion agents only", () => {
 		const agent = createCoordinatorAgent();
+		expect(agent.config.agents?.["notion-thinker-scoper"]).toBe("allow");
 		expect(agent.config.agents?.["notion-thinker-planner"]).toBe("allow");
 		expect(agent.config.agents?.["notion-thinker-investigator"]).toBe("allow");
 		expect(agent.config.agents?.["notion-thinker-refiner"]).toBe("allow");
@@ -62,6 +67,7 @@ describe("createCoordinatorAgent", () => {
 		expect(agent.config.agents?.["notion-reviewer-feature"]).toBe("allow");
 		expect(agent.config.agents?.["notion-reviewer-final"]).toBe("allow");
 		expect(agent.config.agents?.["notion-git-commit-architect"]).toBe("allow");
+		expect(agent.config.agents?.["notion-stacked-pr-architect"]).toBe("allow");
 		expect(agent.config.agents?.["notion-pr-reviewer"]).toBe("allow");
 		expect(agent.config.agents?.["notion-pr-responder"]).toBe("allow");
 		expect(agent.config.agents?.["notion-thinker"]).toBeUndefined();
@@ -118,6 +124,36 @@ describe("createThinkerRefinerAgent", () => {
 
 	it("applies model array correctly", () => {
 		const agent = createThinkerRefinerAgent(["openai/gpt-4o", "anthropic/claude-3-opus"]);
+		expect(agent._modelArray).toHaveLength(2);
+	});
+});
+
+describe("createThinkerScoperAgent", () => {
+	it("creates agent with correct name", () => {
+		const agent = createThinkerScoperAgent();
+		expect(agent.name).toBe("notion-thinker-scoper");
+	});
+
+	it("denies code modification tools", () => {
+		const agent = createThinkerScoperAgent();
+		expect(agent.config.tools?.Edit).toBe(false);
+		expect(agent.config.tools?.Write).toBe(false);
+	});
+
+	it("is a subagent with low temperature for consistent triage", () => {
+		const agent = createThinkerScoperAgent();
+		expect(agent.config.mode).toBe("subagent");
+		expect(agent.config.temperature).toBe(0.2);
+	});
+
+	it("applies string model correctly", () => {
+		const agent = createThinkerScoperAgent("openai/gpt-4o", "max");
+		expect(agent.config.model).toBe("openai/gpt-4o");
+		expect(agent.config.variant).toBe("max");
+	});
+
+	it("applies model array correctly", () => {
+		const agent = createThinkerScoperAgent(["openai/gpt-4o", "anthropic/claude-3-opus"]);
 		expect(agent._modelArray).toHaveLength(2);
 	});
 });
@@ -218,6 +254,75 @@ describe("createPrResponderAgent", () => {
 
 	it("applies model array correctly", () => {
 		const agent = createPrResponderAgent(["openai/gpt-4o", "anthropic/claude-3-opus"]);
+		expect(agent._modelArray).toHaveLength(2);
+	});
+});
+
+describe("createGitCommitArchitectAgent", () => {
+	it("creates agent with correct name", () => {
+		const agent = createGitCommitArchitectAgent();
+		expect(agent.name).toBe("notion-git-commit-architect");
+	});
+
+	it("is a subagent, not primary", () => {
+		const agent = createGitCommitArchitectAgent();
+		expect(agent.config.mode).toBe("subagent");
+	});
+
+	it("applies string model correctly", () => {
+		const agent = createGitCommitArchitectAgent("openai/gpt-4o", "max");
+		expect(agent.config.model).toBe("openai/gpt-4o");
+		expect(agent.config.variant).toBe("max");
+	});
+
+	it("applies model array correctly", () => {
+		const agent = createGitCommitArchitectAgent(["openai/gpt-4o", "anthropic/claude-3-opus"]);
+		expect(agent._modelArray).toHaveLength(2);
+	});
+});
+
+describe("createStackedPrArchitectAgent", () => {
+	it("creates agent with correct name", () => {
+		const agent = createStackedPrArchitectAgent();
+		expect(agent.name).toBe("notion-stacked-pr-architect");
+	});
+
+	it("is a subagent, not primary", () => {
+		const agent = createStackedPrArchitectAgent();
+		expect(agent.config.mode).toBe("subagent");
+	});
+
+	it("applies string model correctly", () => {
+		const agent = createStackedPrArchitectAgent("openai/gpt-4o", "max");
+		expect(agent.config.model).toBe("openai/gpt-4o");
+		expect(agent.config.variant).toBe("max");
+	});
+
+	it("applies model array correctly", () => {
+		const agent = createStackedPrArchitectAgent(["openai/gpt-4o", "anthropic/claude-3-opus"]);
+		expect(agent._modelArray).toHaveLength(2);
+	});
+});
+
+describe("createFinalReviewerAgent", () => {
+	it("creates agent with correct name", () => {
+		const agent = createFinalReviewerAgent();
+		expect(agent.name).toBe("notion-reviewer-final");
+	});
+
+	it("is a subagent, not primary", () => {
+		const agent = createFinalReviewerAgent();
+		expect(agent.config.mode).toBe("subagent");
+	});
+
+	it("denies code modification tools", () => {
+		const agent = createFinalReviewerAgent();
+		expect(agent.config.tools?.Edit).toBe(false);
+		expect(agent.config.tools?.Write).toBe(false);
+	});
+
+	it("applies model array correctly", () => {
+		const agent = createFinalReviewerAgent(["openai/gpt-4o", "anthropic/claude-3-opus"]);
 		expect(agent._modelArray).toHaveLength(2);
 	});
 });

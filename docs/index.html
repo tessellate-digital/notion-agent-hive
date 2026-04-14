@@ -48,7 +48,6 @@
     .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
     section { padding: 96px 0; }
     section + section { border-top: 1px solid var(--border); }
-    .notion-stripe-full + section { border-top: none; }
 
     /* ─── Nav ─── */
     nav {
@@ -193,93 +192,74 @@
     /* ─── Agents grid ─── */
     .agents-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px; margin-top: 48px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px; margin-top: 48px;
     }
 
-    /* Standalone agent card */
     .agent-card {
       background: #fff; border: 1.5px solid var(--border);
-      border-radius: var(--radius); padding: 24px;
+      border-radius: var(--radius); padding: 28px 24px;
       transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+      display: flex; flex-direction: column;
     }
-    .agent-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(245,166,35,0.15); }
-    .agent-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .agent-card:hover {
+      border-color: var(--accent); transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(245,166,35,0.12);
+    }
+    .agent-header {
+      display: flex; align-items: center; gap: 14px; margin-bottom: 14px;
+    }
     .agent-icon {
-      width: 38px; height: 38px; border-radius: var(--radius-sm);
-      display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+      width: 42px; height: 42px; border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
       flex-shrink: 0;
     }
-    .agent-name { font-size: 0.9rem; font-weight: 700; }
-    .agent-role { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
-    .agent-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.55; margin-bottom: 14px; }
-    .agent-model {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: var(--surface-2); border: 1px solid var(--border);
-      border-radius: 100px; padding: 4px 10px;
-      font-size: 0.72rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;
+    .agent-name { font-size: 1rem; font-weight: 700; line-height: 1.2; }
+    .agent-role {
+      font-size: 0.75rem; color: var(--text-faint); margin-top: 3px;
+      text-transform: uppercase; letter-spacing: 0.04em; font-weight: 500;
     }
-    .agent-model .model-dot { width: 6px; height: 6px; border-radius: 50%; }
-
-    /* agent type icon colors */
-    .type-coordinator .agent-icon { background: var(--honey-mid); }
-    .type-executor .agent-icon { background: var(--honey-light); }
-    .type-git .agent-icon { background: #fff0e6; }
-
-    /* Group card — spans both columns */
-    .agent-group {
-      grid-column: 1 / -1;
-      background: #fff; border: 1.5px solid var(--border);
-      border-radius: var(--radius); overflow: hidden;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-      transition: border-color 0.2s, box-shadow 0.2s;
+    .agent-desc {
+      font-size: 0.85rem; color: var(--text-muted); line-height: 1.6;
+      flex: 1;
     }
-    .agent-group:hover { border-color: var(--accent); box-shadow: 0 4px 16px rgba(245,166,35,0.12); }
-    .group-header {
-      display: flex; align-items: flex-start; gap: 14px;
-      padding: 22px 24px;
+    .agent-variants {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px;
+      padding-top: 14px; border-top: 1px solid var(--border);
     }
-    .group-header-text { flex: 1; }
-    .group-name { font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; }
-    .group-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
-    .group-model-area { flex-shrink: 0; padding-top: 2px; }
-
-    /* Subroles row */
-    .subroles-row {
-      display: flex; border-top: 1.5px solid var(--border);
-    }
-    .subrole {
-      flex: 1; padding: 16px 20px;
-      border-right: 1px solid var(--border);
-      display: flex; flex-direction: column; gap: 4px;
-    }
-    .subrole:last-child { border-right: none; }
-    .subrole-icon { font-size: 1rem; margin-bottom: 2px; }
-    .subrole-name { font-size: 0.82rem; font-weight: 700; color: var(--text); }
-    .subrole-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; }
-    .subrole-model {
+    .agent-variant {
       display: inline-flex; align-items: center; gap: 5px;
-      background: #fff; border: 1px solid var(--border);
-      border-radius: 100px; padding: 3px 9px;
-      font-size: 0.68rem; color: var(--text-muted);
-      font-family: 'JetBrains Mono', monospace; margin-top: 4px; align-self: flex-start;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 100px; padding: 4px 12px;
+      font-size: 0.72rem; font-weight: 600; color: var(--text-muted);
     }
-    .subrole-model .model-dot { width: 5px; height: 5px; border-radius: 50%; }
+    .agent-variant .v-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+    }
 
-    /* group accent strips */
-    .group-thinker { border-top: 3px solid #b07d2a; }
-    .group-thinker .group-header { background: #fffdf7; }
-    .group-thinker .subroles-row { background: #fafaf5; }
-    .group-thinker .group-name { color: #8a5e1a; }
-    .group-reviewer { border-top: 3px solid #2d8a4e; }
-    .group-reviewer .group-header { background: #f8fdf9; }
-    .group-reviewer .subroles-row { background: #f3fbf5; }
-    .group-reviewer .group-name { color: #2d8a4e; }
-    .group-pr { border-top: 3px solid #c0392b; }
-    .group-pr .group-header { background: #fdf8f8; }
-    .group-pr .subroles-row { background: #fdf5f5; }
-    .group-pr .group-name { color: #c0392b; }
+    /* Accent top strips per agent type */
+    .agent-card[data-type="coordinator"] { border-top: 3px solid var(--accent); }
+    .agent-card[data-type="coordinator"] .agent-icon { background: var(--honey-mid); }
+    .agent-card[data-type="thinker"] { border-top: 3px solid #b07d2a; }
+    .agent-card[data-type="thinker"] .agent-icon { background: #fef3d0; }
+    .agent-card[data-type="thinker"] .agent-name { color: #8a5e1a; }
+    .agent-card[data-type="executor"] { border-top: 3px solid var(--accent); }
+    .agent-card[data-type="executor"] .agent-icon { background: var(--honey-light); }
+    .agent-card[data-type="reviewer"] { border-top: 3px solid #2d8a4e; }
+    .agent-card[data-type="reviewer"] .agent-icon { background: #e8f5ec; }
+    .agent-card[data-type="reviewer"] .agent-name { color: #2d8a4e; }
+    .agent-card[data-type="git"] { border-top: 3px solid var(--orange); }
+    .agent-card[data-type="git"] .agent-icon { background: #fff0e6; }
+    .agent-card[data-type="pr"] { border-top: 3px solid #c0392b; }
+    .agent-card[data-type="pr"] .agent-icon { background: #fdecea; }
+    .agent-card[data-type="pr"] .agent-name { color: #c0392b; }
+
+    /* Variant dot colors */
+    .v-amber { background: #b07d2a; }
+    .v-green { background: #2d8a4e; }
+    .v-orange { background: var(--orange); }
+    .v-red { background: #c0392b; }
 
     /* ─── Workflow ─── */
     .workflow-steps {
@@ -400,32 +380,31 @@
       opacity: 0.06; pointer-events: none; overflow: hidden;
     }
 
-    /* ─── Notion stripe ─── */
-    .notion-stripe-full {
+    /* ─── Notion callout ─── */
+    .notion-callout {
+      max-width: 1100px; margin: -48px auto 0; padding: 0 24px;
+      position: relative; z-index: 1;
+    }
+    .notion-callout-inner {
       background: var(--honey-light);
-      border-top: 1.5px solid var(--accent);
-      border-bottom: 1.5px solid var(--accent);
-      width: 100%;
+      border: 1.5px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 28px 32px;
+      display: flex; align-items: flex-start; gap: 20px;
     }
-    .notion-stripe {
-      max-width: 1100px; margin: 0 auto; padding: 32px 24px;
-      display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
-    }
-    .notion-stripe-icon { font-size: 2.5rem; flex-shrink: 0; }
-    .notion-stripe-text h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
-    .notion-stripe-text p { font-size: 0.875rem; color: var(--text-muted); line-height: 1.6; max-width: 640px; }
+    .notion-callout-icon { font-size: 1.6rem; flex-shrink: 0; margin-top: 2px; }
+    .notion-callout-text h3 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+    .notion-callout-text p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
 
     /* ─── Responsive ─── */
+    @media (max-width: 960px) {
+      .agents-grid { grid-template-columns: 1fr 1fr; }
+    }
     @media (max-width: 768px) {
       section { padding: 64px 0; }
       .problem-grid { grid-template-columns: 1fr; }
       .install-grid { grid-template-columns: 1fr; }
       .agents-grid { grid-template-columns: 1fr; }
-      .subroles-row { flex-direction: column; }
-      .subrole { border-right: none; border-bottom: 1px solid var(--border); }
-      .subrole:last-child { border-bottom: none; }
-      .group-header { flex-wrap: wrap; }
-      .group-model-area { width: 100%; }
       .nav-links { display: none; }
       .hero { padding: 48px 0 56px; }
     }
@@ -551,6 +530,7 @@
           <li><span class="icon">✅</span> Every decision, finding, and reasoning step is tracked</li>
           <li><span class="icon">✅</span> Mandatory review gates — evidence-anchored, non-skippable</li>
           <li><span class="icon">✅</span> Hard git guard: no push, stash, or force-operations without you</li>
+          <li><span class="icon">✅</span> Released status tracks shipped work — agents skip it automatically</li>
         </ul>
       </div>
     </div>
@@ -558,15 +538,15 @@
   </div>
 </section>
 
-<div class="notion-stripe-full">
-  <div class="notion-stripe">
-    <div class="notion-stripe-icon">🗂️</div>
-    <div class="notion-stripe-text">
+<div class="notion-callout">
+  <div class="notion-callout-inner">
+    <div class="notion-callout-icon">🗂️</div>
+    <div class="notion-callout-text">
       <h3>Notion is your single source of truth</h3>
       <p>
-        Every feature gets its own Notion kanban board. Task tickets track status from
-        <strong>Backlog → In Progress → Review → Human Review</strong>.
-        Only you can move a task to Done — the AI never assumes it's finished.
+        Every feature gets its own Notion kanban board. Tasks move through
+        <strong>Backlog → In Progress → Review → Human Review → Done → Released</strong>.
+        Only you can move a task to Done or Released — the AI never assumes it's finished or shipped.
       </p>
     </div>
   </div>
@@ -630,7 +610,7 @@
         <rect x="472" y="183" width="176" height="52" rx="8" fill="#f5fbf7" stroke="#2d8a4e" stroke-width="1.5"/>
         <text x="560" y="204" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" font-weight="700" fill="#2d8a4e">🔍 Reviewer</text>
         <text x="560" y="221" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#6b6249">Feature · Final · PR</text>
-        <text x="560" y="249" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="#a39880">Fully read-only · Evidence-anchored</text>
+        <text x="560" y="249" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="#a39880">Fully read-only · Skips Released tasks</text>
 
         <!-- ── Git Architect box ── -->
         <rect x="692" y="183" width="176" height="52" rx="8" fill="#fff8f3" stroke="#e8690a" stroke-width="1.5"/>
@@ -648,12 +628,20 @@
     <div class="section-tag">Workflow</div>
     <h2 class="section-title">From idea to reviewed code</h2>
     <p class="section-subtitle">
-      Eight deterministic stages. No shortcuts. Every gate must pass before the next begins.
+      Nine deterministic stages. No shortcuts. Every gate must pass before the next begins.
     </p>
 
     <div class="workflow-steps">
       <div class="workflow-step active">
         <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Scope assessment (optional)</div>
+          <div class="step-desc">For features that look cross-cutting, the Scoper quickly triages which repos, services, or layers are affected — and whether to dispatch one planner or several.</div>
+          <span class="step-tag">notion-thinker-scoper</span>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-num">2</div>
         <div class="step-body">
           <div class="step-title">Deep research & interrogation</div>
           <div class="step-desc">The Thinker-Planner reads the codebase, asks clarifying questions, and builds a full understanding of the feature scope before writing a single line of spec.</div>
@@ -661,7 +649,7 @@
         </div>
       </div>
       <div class="workflow-step">
-        <div class="step-num">2</div>
+        <div class="step-num">3</div>
         <div class="step-body">
           <div class="step-title">Task decomposition & Notion board creation</div>
           <div class="step-desc">Work is broken into independent, implementable tickets. The Coordinator creates a Notion feature page with a full kanban board. This is your persistent record.</div>
@@ -669,15 +657,15 @@
         </div>
       </div>
       <div class="workflow-step">
-        <div class="step-num">3</div>
+        <div class="step-num">4</div>
         <div class="step-body">
           <div class="step-title">Reuse scan + TDD implementation</div>
-          <div class="step-desc">Before writing code, the Executor scans for existing utilities to avoid duplication. Implementation follows strict TDD: red test first, then make it green.</div>
+          <div class="step-desc">Before writing code, the Executor scans for existing utilities to avoid duplication. Implementation follows strict TDD: red test first, then make it green. Each task is tagged with its Repo.</div>
           <span class="step-tag">notion-executor · temperature 0.1</span>
         </div>
       </div>
       <div class="workflow-step">
-        <div class="step-num">4</div>
+        <div class="step-num">5</div>
         <div class="step-body">
           <div class="step-title">Per-task feature review</div>
           <div class="step-desc">An independent reviewer verifies each task against its spec. Every finding must cite file path and line number. No self-reports from the Executor are trusted.</div>
@@ -685,23 +673,23 @@
         </div>
       </div>
       <div class="workflow-step">
-        <div class="step-num">5</div>
+        <div class="step-num">6</div>
         <div class="step-body">
           <div class="step-title">Final coherence review</div>
-          <div class="step-desc">A second reviewer checks cross-task integration, duplication across tasks, and alignment with the original feature spec as a whole — not just per ticket.</div>
+          <div class="step-desc">A second reviewer checks cross-task integration, duplication across tasks, and alignment with the original feature spec as a whole. Released tasks are excluded.</div>
           <span class="step-tag">notion-reviewer-final · read-only</span>
         </div>
       </div>
       <div class="workflow-step">
-        <div class="step-num">6</div>
+        <div class="step-num">7</div>
         <div class="step-body">
-          <div class="step-title">Atomic commit crafting</div>
-          <div class="step-desc">The Git Architect groups changes into logical, atomic commits following conventional commit conventions. It never pushes — you always review and approve.</div>
-          <span class="step-tag">notion-git-commit-architect</span>
+          <div class="step-title">Commit or stack structuring</div>
+          <div class="step-desc">Choose between atomic conventional commits or stacked PRs via <code>gh stack</code>. The appropriate architect groups changes, proposes a plan, and executes only after your approval.</div>
+          <span class="step-tag">notion-git-commit-architect / notion-stacked-pr-architect</span>
         </div>
       </div>
       <div class="workflow-step">
-        <div class="step-num">7</div>
+        <div class="step-num">8</div>
         <div class="step-body">
           <div class="step-title">PR review classification</div>
           <div class="step-desc">When your PR gets comments, the PR Reviewer fetches them from GitHub and classifies each as Critical / Actionable / Nitpick / Wrong — with investigation and context.</div>
@@ -709,11 +697,11 @@
         </div>
       </div>
       <div class="workflow-step">
-        <div class="step-num">8</div>
+        <div class="step-num">9</div>
         <div class="step-body">
           <div class="step-title">Human review gate</div>
-          <div class="step-desc">No task ever moves to Done automatically. You are always the final decision-maker. The AI surfaces findings; you approve the outcome.</div>
-          <span class="step-tag">👤 You → Human Review → Done</span>
+          <div class="step-desc">No task ever moves to Done or Released automatically. You are always the final decision-maker. The AI surfaces findings; you approve the outcome and mark tasks as shipped.</div>
+          <span class="step-tag">👤 You → Human Review → Done → Released</span>
         </div>
       </div>
     </div>
@@ -726,161 +714,116 @@
     <div class="section-tag">Agents</div>
     <h2 class="section-title">Meet the hive</h2>
     <p class="section-subtitle">
-      Each agent is tuned for its role — temperature, model, and tool access are all set deliberately.
+      Each agent has a focused role with strict boundaries. Models are fully configurable per agent.
     </p>
 
     <div class="agents-grid">
 
       <!-- Coordinator -->
-      <div class="agent-card type-coordinator">
+      <div class="agent-card" data-type="coordinator">
         <div class="agent-header">
           <div class="agent-icon">🧠</div>
           <div>
             <div class="agent-name">Coordinator</div>
-            <div class="agent-role">Entry point · Notion owner · Dispatcher</div>
+            <div class="agent-role">Entry point · Dispatcher</div>
           </div>
         </div>
         <div class="agent-desc">
-          Receives every request, manages the Notion board lifecycle, and routes work to subagents.
+          Receives every request, manages the Notion board lifecycle, and routes work to the right subagent.
           The only agent allowed to write to Notion.
         </div>
-        <span class="agent-model">
-          <span class="model-dot" style="background:var(--accent)"></span>
-          claude-sonnet-4-6 · temp 0.2
-        </span>
+      </div>
+
+      <!-- Thinker -->
+      <div class="agent-card" data-type="thinker">
+        <div class="agent-header">
+          <div class="agent-icon">💡</div>
+          <div>
+            <div class="agent-name">Thinker</div>
+            <div class="agent-role">Research · Read-only</div>
+          </div>
+        </div>
+        <div class="agent-desc">
+          Deep research, planning, and analysis. Always read-only — never touches source code.
+          Spawned by the Coordinator in four modes depending on the phase.
+        </div>
+        <div class="agent-variants">
+          <span class="agent-variant"><span class="v-dot v-amber"></span> Scoper</span>
+          <span class="agent-variant"><span class="v-dot v-amber"></span> Planner</span>
+          <span class="agent-variant"><span class="v-dot v-amber"></span> Investigator</span>
+          <span class="agent-variant"><span class="v-dot v-amber"></span> Refiner</span>
+        </div>
       </div>
 
       <!-- Executor -->
-      <div class="agent-card type-executor">
+      <div class="agent-card" data-type="executor">
         <div class="agent-header">
           <div class="agent-icon">⚙️</div>
           <div>
             <div class="agent-name">Executor</div>
-            <div class="agent-role">TDD implementation · Code-only</div>
+            <div class="agent-role">TDD · Code-only</div>
           </div>
         </div>
         <div class="agent-desc">
           The only agent that writes source code. Mandates a TDD red phase before implementation,
-          scans for reusable utilities first, and never touches Notion.
-        </div>
-        <span class="agent-model">
-          <span class="model-dot" style="background:var(--accent)"></span>
-          claude-sonnet-4-6 · temp 0.1
-        </span>
-      </div>
-
-      <!-- Thinker group -->
-      <div class="agent-group group-thinker">
-        <div class="group-header">
-          <div class="agent-icon" style="background:#fef3d0;width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">💡</div>
-          <div class="group-header-text">
-            <div class="group-name">Thinker</div>
-            <div class="group-desc">Deep research, planning, and analysis. Always read-only — never touches source code. Spawned by the Coordinator for each thinking phase.</div>
-          </div>
-          <div class="group-model-area">
-            <span class="agent-model">
-              <span class="model-dot" style="background:#b07d2a"></span>
-              gpt-5.4 · xhigh effort · temp 0.3
-            </span>
-          </div>
-        </div>
-        <div class="subroles-row">
-          <div class="subrole">
-            <div class="subrole-icon">📋</div>
-            <div class="subrole-name">Planner</div>
-            <div class="subrole-desc">Explores the codebase, interrogates requirements, and decomposes the feature into independent implementable task tickets.</div>
-          </div>
-          <div class="subrole">
-            <div class="subrole-icon">🔎</div>
-            <div class="subrole-name">Investigator</div>
-            <div class="subrole-desc">Called when the Executor is blocked. Performs root-cause analysis and returns a structured unblocking plan.</div>
-          </div>
-          <div class="subrole">
-            <div class="subrole-icon">✏️</div>
-            <div class="subrole-name">Refiner</div>
-            <div class="subrole-desc">Revises task tickets based on review feedback or user direction. Updates specs in Notion without changing code.</div>
-          </div>
+          scans for reusable utilities first, tags each task with its repo, and never touches Notion.
         </div>
       </div>
 
-      <!-- Reviewer group -->
-      <div class="agent-group group-reviewer">
-        <div class="group-header">
-          <div class="agent-icon" style="background:#e8f5ec;width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">🔍</div>
-          <div class="group-header-text">
-            <div class="group-name">Reviewer</div>
-            <div class="group-desc">Independent, evidence-anchored quality gates. Every finding must cite a file path and line number. Fully read-only — never trusts the Executor's self-report.</div>
-          </div>
-        </div>
-        <div class="subroles-row">
-          <div class="subrole">
-            <div class="subrole-icon">🧪</div>
-            <div class="subrole-name">Feature</div>
-            <div class="subrole-desc">Verifies each task individually against its spec. Runs after every Executor cycle before the task can proceed.</div>
-            <span class="subrole-model">
-              <span class="model-dot" style="background:#2d8a4e"></span>
-              claude-opus-4-6 · temp 0.1
-            </span>
-          </div>
-          <div class="subrole">
-            <div class="subrole-icon">🏁</div>
-            <div class="subrole-name">Final</div>
-            <div class="subrole-desc">Checks cross-task coherence, duplication, and integration gaps across the whole feature once all per-task reviews pass.</div>
-            <span class="subrole-model">
-              <span class="model-dot" style="background:#2d8a4e"></span>
-              gpt-5.4 · xhigh effort
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Git Architect -->
-      <div class="agent-card type-git">
+      <!-- Reviewer -->
+      <div class="agent-card" data-type="reviewer">
         <div class="agent-header">
-          <div class="agent-icon" style="background:#fff0e6;">📦</div>
+          <div class="agent-icon">🔍</div>
           <div>
-            <div class="agent-name">Git Architect</div>
-            <div class="agent-role">Atomic commits · Conventional format</div>
+            <div class="agent-name">Reviewer</div>
+            <div class="agent-role">Quality gates · Read-only</div>
           </div>
         </div>
         <div class="agent-desc">
-          Groups staged changes into logical, atomic commits following conventional commit conventions.
-          Deterministic at temp 0.1. Never pushes — always awaits your approval.
+          Independent, evidence-anchored quality gates. Every finding must cite a file path and line number.
+          Fully read-only — never trusts the Executor's self-report. Skips Released tasks.
         </div>
-        <span class="agent-model">
-          <span class="model-dot" style="background:var(--orange)"></span>
-          claude-opus-4-6 · temp 0.1
-        </span>
+        <div class="agent-variants">
+          <span class="agent-variant"><span class="v-dot v-green"></span> Feature</span>
+          <span class="agent-variant"><span class="v-dot v-green"></span> Final</span>
+        </div>
       </div>
 
-      <!-- PR group -->
-      <div class="agent-group group-pr" style="grid-column: auto;">
-        <div class="group-header">
-          <div class="agent-icon" style="background:#fdecea;width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">🐙</div>
-          <div class="group-header-text">
-            <div class="group-name">PR Agents</div>
-            <div class="group-desc">Handles the full GitHub pull request feedback loop — from classifying incoming comments to drafting and posting replies.</div>
+      <!-- Git Architects -->
+      <div class="agent-card" data-type="git">
+        <div class="agent-header">
+          <div class="agent-icon">📦</div>
+          <div>
+            <div class="agent-name">Git Architects</div>
+            <div class="agent-role">Commits & Stacked PRs</div>
           </div>
         </div>
-        <div class="subroles-row">
-          <div class="subrole">
-            <div class="subrole-icon">💬</div>
-            <div class="subrole-name">Reviewer</div>
-            <div class="subrole-desc">Fetches PR comments from GitHub and classifies each as Critical / Actionable / Nitpick / Wrong after investigating the relevant code context.</div>
-            <span class="subrole-model">
-              <span class="model-dot" style="background:#c0392b"></span>
-              claude-opus-4-6 · read-only
-            </span>
+        <div class="agent-desc">
+          Structures your changes for review. Choose between atomic conventional commits on the current
+          branch, or ordered stacked PRs via <code>gh stack</code>. Never pushes — always awaits your approval.
+        </div>
+        <div class="agent-variants">
+          <span class="agent-variant"><span class="v-dot v-orange"></span> Commit</span>
+          <span class="agent-variant"><span class="v-dot v-orange"></span> Stacked PR</span>
+        </div>
+      </div>
+
+      <!-- PR Agents -->
+      <div class="agent-card" data-type="pr">
+        <div class="agent-header">
+          <div class="agent-icon">🐙</div>
+          <div>
+            <div class="agent-name">PR Agents</div>
+            <div class="agent-role">GitHub feedback loop</div>
           </div>
-          <div class="subrole">
-            <div class="subrole-icon">📝</div>
-            <div class="subrole-name">Responder</div>
-            <div class="subrole-desc">Drafts responses to classified PR comments and can post them to GitHub on your behalf. Balanced tone for professional communication.</div>
-            <span class="subrole-model">
-              <span class="model-dot" style="background:#c0392b"></span>
-              claude-sonnet-4-6 · temp 0.3
-            </span>
-          </div>
+        </div>
+        <div class="agent-desc">
+          Handles the full GitHub pull request feedback loop — from classifying incoming review
+          comments to drafting and posting replies on your behalf.
+        </div>
+        <div class="agent-variants">
+          <span class="agent-variant"><span class="v-dot v-red"></span> Reviewer</span>
+          <span class="agent-variant"><span class="v-dot v-red"></span> Responder</span>
         </div>
       </div>
 
@@ -906,12 +849,12 @@
       <div class="feature-card">
         <span class="feature-icon">🧱</span>
         <div class="feature-title">Hard enforcement gates</div>
-        <div class="feature-desc">TDD red phase before any implementation. No git stash. No skipping reviews. No task moving to Done. These are non-negotiable rules enforced in every prompt.</div>
+        <div class="feature-desc">TDD red phase before any implementation. No git stash. No skipping reviews. No task moving to Done or Released. These are non-negotiable rules enforced in every prompt.</div>
       </div>
       <div class="feature-card">
         <span class="feature-icon">📋</span>
         <div class="feature-title">Persistent kanban boards</div>
-        <div class="feature-desc">Every feature gets a Notion board. Tasks move through Backlog → In Progress → Review → Human Review. The board survives session restarts, rate limits, and context resets.</div>
+        <div class="feature-desc">Every feature gets a Notion board. Tasks move through Backlog → In Progress → Review → Human Review → Done → Released. The board survives session restarts, rate limits, and context resets.</div>
       </div>
       <div class="feature-card">
         <span class="feature-icon">🔬</span>
@@ -931,7 +874,7 @@
       <div class="feature-card">
         <span class="feature-icon">🏷️</span>
         <div class="feature-title">Conventional commits</div>
-        <div class="feature-desc">The Git Architect groups and names commits following the conventional commit specification. Deterministic, atomic, and always awaiting your approval before any push.</div>
+        <div class="feature-desc">The Git Commit Architect groups and names commits following the conventional commit specification. Deterministic, atomic, and always awaiting your approval before any push.</div>
       </div>
       <div class="feature-card">
         <span class="feature-icon">🐙</span>
@@ -939,7 +882,22 @@
         <div class="feature-desc">Fetch PR review comments directly from GitHub, classify them by severity, and optionally post drafted responses — all within your OpenCode session.</div>
       </div>
       <div class="feature-card">
+        <span class="feature-icon">🥞</span>
+        <div class="feature-title">Stacked PRs via gh-stack</div>
+        <div class="feature-desc">Choose between normal atomic commits or ordered stacked PRs. The Stacked PR Architect groups changes into layers, each becoming an independently reviewable PR on GitHub.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🏷️</span>
+        <div class="feature-title">Per-task repo tagging</div>
+        <div class="feature-desc">The Executor tags each task with its repository name. The Coordinator can scope reviews and execution to specific repos — essential for multi-repo features.</div>
+      </div>
+      <div class="feature-card">
         <span class="feature-icon">🎯</span>
+        <div class="feature-title">Multi-vertical scope triage</div>
+        <div class="feature-desc">For features spanning multiple repos or services, the Scoper quickly determines whether to dispatch one planner or several — avoiding wasted planning cycles.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🔀</span>
         <div class="feature-title">Focused subagent contexts</div>
         <div class="feature-desc">Each subagent receives only the context it needs. No shared context degradation. Long features are handled through multiple focused sessions, not one bloated one.</div>
       </div>
@@ -1024,7 +982,7 @@
           <pre><code><span class="hl-comment"># Configure any of these per agent:</span>
 coordinator · thinker · executor
 reviewer · finalReviewer
-gitCommitArchitect
+gitCommitArchitect · stackedPrArchitect
 prReviewer · prResponder</code></pre>
         </div>
       </div>

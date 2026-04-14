@@ -15,7 +15,9 @@
         "reviewer": { "$ref": "#/definitions/agentConfig" },
         "finalReviewer": { "$ref": "#/definitions/agentConfig" },
         "gitCommitArchitect": { "$ref": "#/definitions/agentConfig" },
-        "prReviewer": { "$ref": "#/definitions/agentConfig" }
+        "stackedPrArchitect": { "$ref": "#/definitions/agentConfig" },
+        "prReviewer": { "$ref": "#/definitions/agentConfig" },
+        "prResponder": { "$ref": "#/definitions/agentConfig" }
       },
       "additionalProperties": false
     },

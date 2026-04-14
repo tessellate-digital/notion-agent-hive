@@ -123,9 +123,28 @@ Return FAIL with specific feedback if changes needed (task returns to To Do).
 Write your review findings to the ticket's Notes field.
 \`\`\``;
 
+export const SCOPE_ANALYSE_TEMPLATE = `### Thinker-Scoper (SCOPE_ANALYSE)
+
+Use when a feature request looks large or cross-cutting and you want a fast triage
+before committing to one planner or multiple planners.
+
+\`\`\`
+DISPATCH: SCOPE_ANALYSE
+
+BOARD_ID: {{board_id}}
+FEATURE_DESCRIPTION: {{feature_description}}
+
+INSTRUCTIONS:
+Quickly assess the scope of this feature. Identify which repos, services,
+or infrastructure layers are affected and whether the work in each is
+substantial enough to warrant its own planning loop.
+Return a SCOPE_REPORT with your verdict: SINGLE_PLANNER or MULTI_PLANNER.
+Do not produce a plan, task breakdown, or detailed investigation.
+\`\`\``;
+
 export const GIT_COMMIT_TEMPLATE = `### Git Commit Architect (GIT_COMMIT)
 
-Use when the user wants to commit changes.
+Use when the user wants a normal linear commit history.
 
 \`\`\`
 DISPATCH: GIT_COMMIT
@@ -138,6 +157,24 @@ INSTRUCTIONS:
 Analyze all staged and unstaged changes. Group them into atomic,
 coherent commits. Return a GIT_COMMIT_PLAN before executing anything.
 Wait for coordinator approval before running any git write commands.
+\`\`\``;
+
+export const STACKED_PR_TEMPLATE = `### Stacked PR Architect (GIT_STACK)
+
+Use when the user wants a stacked PR history with gh-stack.
+
+\`\`\`
+DISPATCH: GIT_STACK
+
+BOARD_ID: {{board_id}}
+FEATURE_TITLE: {{feature_title}}
+SCOPE: {{scope_description}}
+
+INSTRUCTIONS:
+Analyze all staged and unstaged changes. Group them into ordered,
+reviewable stack layers. Return a GIT_STACK_PLAN before executing anything.
+Wait for coordinator approval before running any git or gh-stack write commands.
+Do not push branches or submit PRs.
 \`\`\``;
 
 export const FINAL_REVIEW_TEMPLATE = `### Final Reviewer (FINAL_REVIEW)
