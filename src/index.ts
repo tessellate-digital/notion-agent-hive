@@ -1,6 +1,7 @@
 import { createCoordinatorAgent } from "./agents/coordinator";
 import { createExecutorAgent } from "./agents/executor";
-import { createGitCommitArchitectAgent } from "./agents/git-commit-architect";
+import { createGitCommitArchitectAgent } from "./agents/git/commit-architect";
+import { createStackedPrArchitectAgent } from "./agents/git/stacked-pr-architect";
 import { createPrReviewerAgent } from "./agents/pr/reviewer";
 import { createPrResponderAgent } from "./agents/pr/responder";
 import { createReviewerAgent } from "./agents/reviewer/feature";
@@ -8,6 +9,7 @@ import { createFinalReviewerAgent } from "./agents/reviewer/final";
 import { createThinkerInvestigatorAgent } from "./agents/thinker/investigator";
 import { createThinkerPlannerAgent } from "./agents/thinker/planner";
 import { createThinkerRefinerAgent } from "./agents/thinker/refiner";
+import { createThinkerScoperAgent } from "./agents/thinker/scoper";
 // src/index.ts
 import type { AgentDefinition } from "./agents/types";
 import { DEFAULT_MODELS, DEFAULT_VARIANTS, loadConfig } from "./config";
@@ -19,10 +21,12 @@ export { createCoordinatorAgent } from "./agents/coordinator";
 export { createThinkerPlannerAgent } from "./agents/thinker/planner";
 export { createThinkerInvestigatorAgent } from "./agents/thinker/investigator";
 export { createThinkerRefinerAgent } from "./agents/thinker/refiner";
+export { createThinkerScoperAgent } from "./agents/thinker/scoper";
 export { createExecutorAgent } from "./agents/executor";
 export { createReviewerAgent } from "./agents/reviewer/feature";
 export { createFinalReviewerAgent } from "./agents/reviewer/final";
-export { createGitCommitArchitectAgent } from "./agents/git-commit-architect";
+export { createGitCommitArchitectAgent } from "./agents/git/commit-architect";
+export { createStackedPrArchitectAgent } from "./agents/git/stacked-pr-architect";
 export { createPrReviewerAgent } from "./agents/pr/reviewer";
 export { createPrResponderAgent } from "./agents/pr/responder";
 export { ForegroundFallbackManager } from "./fallback";
@@ -49,6 +53,10 @@ export const NotionAgentHivePlugin: Plugin = async ({ directory }) => {
       config.agents?.thinker?.model ?? DEFAULT_MODELS.thinker,
       config.agents?.thinker?.variant ?? DEFAULT_VARIANTS.thinker,
     ),
+    createThinkerScoperAgent(
+      config.agents?.thinker?.model ?? DEFAULT_MODELS.thinker,
+      config.agents?.thinker?.variant ?? DEFAULT_VARIANTS.thinker,
+    ),
     createExecutorAgent(
       config.agents?.executor?.model ?? DEFAULT_MODELS.executor,
       config.agents?.executor?.variant ?? DEFAULT_VARIANTS.executor,
@@ -66,6 +74,12 @@ export const NotionAgentHivePlugin: Plugin = async ({ directory }) => {
         DEFAULT_MODELS.gitCommitArchitect,
       config.agents?.gitCommitArchitect?.variant ??
         DEFAULT_VARIANTS.gitCommitArchitect,
+    ),
+    createStackedPrArchitectAgent(
+      config.agents?.stackedPrArchitect?.model ??
+        DEFAULT_MODELS.stackedPrArchitect,
+      config.agents?.stackedPrArchitect?.variant ??
+        DEFAULT_VARIANTS.stackedPrArchitect,
     ),
     createPrReviewerAgent(
       config.agents?.prReviewer?.model ?? DEFAULT_MODELS.prReviewer,

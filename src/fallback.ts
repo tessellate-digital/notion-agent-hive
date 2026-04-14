@@ -18,12 +18,14 @@ const { version } = packageJson;
 
 const AGENT_CHAIN_ALIASES: Record<string, string[]> = {
 	coordinator: [`notion agent hive v${version}`],
-	thinker: ["notion-thinker-planner", "notion-thinker-investigator", "notion-thinker-refiner"],
+	thinker: ["notion-thinker-planner", "notion-thinker-investigator", "notion-thinker-refiner", "notion-thinker-scoper"],
 	executor: ["notion-executor"],
 	reviewer: ["notion-reviewer-feature"],
 	finalReviewer: ["notion-reviewer-final"],
 	gitCommitArchitect: ["notion-git-commit-architect"],
-	prReviewer: ["notion-reviewer-pr"],
+	stackedPrArchitect: ["notion-stacked-pr-architect"],
+	prReviewer: ["notion-pr-reviewer"],
+	prResponder: ["notion-pr-responder"],
 };
 
 function normalizeChains(chains: Record<string, string[]>): Record<string, string[]> {

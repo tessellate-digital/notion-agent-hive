@@ -28,6 +28,7 @@ const PluginConfigSchema = z.object({
       reviewer: AgentConfigSchema.optional(),
       finalReviewer: AgentConfigSchema.optional(),
       gitCommitArchitect: AgentConfigSchema.optional(),
+      stackedPrArchitect: AgentConfigSchema.optional(),
       prReviewer: AgentConfigSchema.optional(),
       prResponder: AgentConfigSchema.optional(),
     })
@@ -50,6 +51,7 @@ export const DEFAULT_MODELS = {
   reviewer: "github-copilot/claude-opus-4.6",
   finalReviewer: "openai/gpt-5.4",
   gitCommitArchitect: "github-copilot/claude-opus-4.6",
+  stackedPrArchitect: "github-copilot/claude-opus-4.6",
   prReviewer: "github-copilot/claude-opus-4.6",
   prResponder: "github-copilot/claude-sonnet-4.6",
 } as const;
@@ -61,6 +63,7 @@ export const DEFAULT_VARIANTS = {
   reviewer: undefined,
   finalReviewer: "xhigh",
   gitCommitArchitect: undefined,
+  stackedPrArchitect: undefined,
   prReviewer: undefined,
   prResponder: undefined,
 } as const;
